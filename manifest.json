@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "Plato Calendar 2",
+  "version": "1.0.0",
+  "description": "부산대학교 교육플랫폼 플라토 확장 프로그램",
+  "background": {
+    "service_worker": "service-worker.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://plato.pusan.ac.kr/*"],
+      "css": ["assets/style.css"],
+      "js": ["scripts/content-script.js", "scripts/side-panel.js"]
+    }
+  ]
+}

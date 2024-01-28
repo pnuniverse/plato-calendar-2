@@ -1,0 +1,14 @@
+{
+  "extends": ["airbnb-base", "plugin:prettier/recommended"],
+  "rules": {
+    "no-undef": "off",
+    "prettier/prettier": [
+      "error",
+      {
+        "singleQuote": true,
+        "endOfLine": "auto"
+      }
+    ],
+    "eslint-plugin-import/extensions": [["error", "always"]]
+  }
+}
