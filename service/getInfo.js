@@ -41,25 +41,19 @@ const getHomeworkInfo = () => {
  * quiz 정보를 가져온다.
  * @returns { Assignment[] }
  */
-const getQuizInfo = () => {
-  return [];
-};
+const getQuizInfo = () => [];
 
 /**
  * video 정보를 가져온다.
  * @returns { Assignment[] }
  */
-const getVideoInfo = () => {
-  return [];
-};
+const getVideoInfo = () => [];
 
 /**
  * zoom 정보를 가져온다.
  * @returns { Assignment[] }
  */
-const getZoomInfo = () => {
-  return [];
-};
+const getZoomInfo = () => [];
 
 /**
  * 모든 과제(homework, quiz, video, zoom) 정보를 가져온다.
