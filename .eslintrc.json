@@ -10,6 +10,7 @@
   },
   "rules": {
     "no-unused-vars": "warn",
+    "import/extensions": "off",
     "prettier/prettier": [
       "error",
       {
