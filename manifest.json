@@ -11,7 +11,7 @@
     {
       "matches": ["https://plato.pusan.ac.kr/*"],
       "css": ["assets/style.css"],
-      "js": ["scripts/content-script.js", "scripts/side-panel.js"]
+      "js": ["content-script.js"]
     }
   ]
 }

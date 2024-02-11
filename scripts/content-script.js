@@ -1,4 +1,9 @@
+import sidePanel from './side-panel';
+import getInfo from './getInfo';
+
 console.log('content-script.js loaded');
+sidePanel();
+getInfo();
 
 window.onload = () => {
   const container = document.createElement('div');

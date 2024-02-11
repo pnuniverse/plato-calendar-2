@@ -1,1 +1,3 @@
-console.log('side-panel.js loaded');
+export default function sidePanel() {
+  console.log('side-panel.js loaded');
+}
