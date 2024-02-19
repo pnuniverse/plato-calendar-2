@@ -31,38 +31,41 @@ class Assignment {
 
 /**
  * homework 정보를 가져온다.
+ * @param { string[] } courseIdList - 과목 id 리스트
  * @returns { Promise<Assignment[]> }
  */
-const getHomeworkInfo = async () => {
+const getHomeworkInfo = async (courseIdList) => {
   const result = [];
-  const res = await fetch(
-    'https://plato.pusan.ac.kr/mod/assign/index.php?id=140499',
-  );
-  const text = await res.text();
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(text, 'text/html');
-  const rows = doc.querySelectorAll('tbody tr');
-  for (let i = 0; i < rows.length; i += 1) {
-    const title = rows[i].querySelector('td.cell.c1 a')?.innerHTML;
-    const link = rows[i].querySelector('td.cell.c1 a')?.href;
-    const dueDate = new Date(rows[i].querySelector('td.cell.c2')?.innerHTML);
-    const isDone =
-      rows[i].querySelector('td.cell.c3')?.innerHTML === '제출 완료';
+  courseIdList.map(async (courseId) => {
+    const res = await fetch(
+      `https://plato.pusan.ac.kr/mod/assign/index.php?id=${courseId}`,
+    );
+    const text = await res.text();
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(text, 'text/html');
+    const rows = doc.querySelectorAll('tbody tr');
+    for (let i = 0; i < rows.length; i += 1) {
+      const title = rows[i].querySelector('td.cell.c1 a')?.innerHTML;
+      const link = rows[i].querySelector('td.cell.c1 a')?.href;
+      const dueDate = new Date(rows[i].querySelector('td.cell.c2')?.innerHTML);
+      const isDone =
+        rows[i].querySelector('td.cell.c3')?.innerHTML === '제출 완료';
 
-    if (title !== undefined) {
-      const content = '임시 데이터';
-      result.push(
-        new Assignment(
-          title,
-          content,
-          link,
-          dueDate,
-          ASSIGNMENT_TYPE.HOMEWORK,
-          isDone,
-        ),
-      );
+      if (title !== undefined) {
+        const content = '임시 데이터';
+        result.push(
+          new Assignment(
+            title,
+            content,
+            link,
+            dueDate,
+            ASSIGNMENT_TYPE.HOMEWORK,
+            isDone,
+          ),
+        );
+      }
     }
-  }
+  });
 
   return result;
 };
@@ -105,10 +108,10 @@ const getInfo = async () => {
   console.log(`my courseIdList: ${courseIdList.toString()}`);
 
   return [
-    ...(await getHomeworkInfo()),
-    ...(await getQuizInfo()),
-    ...(await getVideoInfo()),
-    ...(await getZoomInfo()),
+    ...(await getHomeworkInfo(courseIdList)),
+    ...(await getQuizInfo(courseIdList)),
+    ...(await getVideoInfo(courseIdList)),
+    ...(await getZoomInfo(courseIdList)),
   ];
 };
 
