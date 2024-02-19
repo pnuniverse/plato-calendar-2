@@ -31,42 +31,84 @@ class Assignment {
 
 /**
  * homework 정보를 가져온다.
- * @returns { Assignment[] }
+ * @returns { Promise<Assignment[]> }
  */
-const getHomeworkInfo = () => {
-  return [];
+const getHomeworkInfo = async () => {
+  const result = [];
+  const res = await fetch(
+    'https://plato.pusan.ac.kr/mod/assign/index.php?id=140499',
+  );
+  const text = await res.text();
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(text, 'text/html');
+  const rows = doc.querySelectorAll('tbody tr');
+  for (let i = 0; i < rows.length; i += 1) {
+    const title = rows[i].querySelector('td.cell.c1 a')?.innerHTML;
+    const link = rows[i].querySelector('td.cell.c1 a')?.href;
+    const dueDate = new Date(rows[i].querySelector('td.cell.c2')?.innerHTML);
+    const isDone =
+      rows[i].querySelector('td.cell.c3')?.innerHTML === '제출 완료';
+
+    if (title !== undefined) {
+      const content = '임시 데이터';
+      result.push(
+        new Assignment(
+          title,
+          content,
+          link,
+          dueDate,
+          ASSIGNMENT_TYPE.HOMEWORK,
+          isDone,
+        ),
+      );
+    }
+  }
+
+  return result;
 };
 
 /**
  * quiz 정보를 가져온다.
- * @returns { Assignment[] }
+ * @returns { Promise<Assignment[]> }
  */
 const getQuizInfo = () => [];
 
 /**
  * video 정보를 가져온다.
- * @returns { Assignment[] }
+ * @returns { Promise<Assignment[]> }
  */
 const getVideoInfo = () => [];
 
 /**
  * zoom 정보를 가져온다.
- * @returns { Assignment[] }
+ * @returns { Promise<Assignment[]> }
  */
 const getZoomInfo = () => [];
 
 /**
  * 모든 과제(homework, quiz, video, zoom) 정보를 가져온다.
- * @returns { Assignment[] }
+ * @returns { Promise<Assignment[]> }
  */
-const getInfo = () => {
-  console.log('getInfo() called');
+const getInfo = async () => {
+  const res = await fetch('https://plato.pusan.ac.kr');
+  const text = await res.text();
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(text, 'text/html');
+  const courseLinkList = doc.querySelectorAll(
+    '.my-course-lists > .course-label-r > .course-box > a',
+  );
+  const courseIdList = [];
+  for (let i = 0; i < courseLinkList.length; i += 1) {
+    courseIdList.push(courseLinkList[i].href.split('?id=')[1]);
+  }
+
+  console.log(`my courseIdList: ${courseIdList.toString()}`);
 
   return [
-    ...getHomeworkInfo(),
-    ...getQuizInfo(),
-    ...getVideoInfo(),
-    ...getZoomInfo(),
+    ...(await getHomeworkInfo()),
+    ...(await getQuizInfo()),
+    ...(await getVideoInfo()),
+    ...(await getZoomInfo()),
   ];
 };
 
