@@ -130,15 +130,17 @@ const getQuizInfo = async (courseIdList) => {
 
 /**
  * video 정보를 가져온다.
+ * @param { string[] } courseIdList - 과목 id 리스트
  * @returns { Promise<Assignment[]> }
  */
-const getVideoInfo = () => [];
+const getVideoInfo = async (courseIdList) => [];
 
 /**
  * zoom 정보를 가져온다.
+ * @param { string[] } courseIdList - 과목 id 리스트
  * @returns { Promise<Assignment[]> }
  */
-const getZoomInfo = () => [];
+const getZoomInfo = async (courseIdList) => [];
 
 /**
  * 모든 과제(homework, quiz, video, zoom) 정보를 가져온다.
@@ -152,19 +154,30 @@ const getInfo = async () => {
   const courseLinkList = doc.querySelectorAll(
     '.my-course-lists > .course-label-r > .course-box > a',
   );
-  const courseIdList = [];
-  for (let i = 0; i < courseLinkList.length; i += 1) {
-    courseIdList.push(courseLinkList[i].href.split('?id=')[1]);
-  }
+
+  const courseIdList = [
+    '140487',
+    '140494',
+    '140499',
+    '140522',
+    '140527',
+    '140529',
+    '140533',
+  ];
+  // const courseIdList = [];
+  // for (let i = 0; i < courseLinkList.length; i += 1) {
+  //   courseIdList.push(courseLinkList[i].href.split('?id=')[1]);
+  // }
 
   console.log(`my courseIdList: ${courseIdList.toString()}`);
 
-  return [
-    ...(await getHomeworkInfo(courseIdList)),
-    ...(await getQuizInfo(courseIdList)),
-    ...(await getVideoInfo(courseIdList)),
-    ...(await getZoomInfo(courseIdList)),
-  ];
+  const result = await Promise.all([
+    getHomeworkInfo(courseIdList),
+    getQuizInfo(courseIdList),
+    getVideoInfo(courseIdList),
+    getZoomInfo(courseIdList),
+  ]);
+  return result.flat();
 };
 
 export default getInfo;
