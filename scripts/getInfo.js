@@ -133,7 +133,55 @@ const getQuizInfo = async (courseIdList) => {
  * @param { string[] } courseIdList - 과목 id 리스트
  * @returns { Promise<Assignment[]> }
  */
-const getVideoInfo = async (courseIdList) => [];
+const getVideoInfo = async (courseIdList) => {
+  const promises = courseIdList.map((courseId) => {
+    return new Promise((resolve) => {
+      (async () => {
+        const result = [];
+        const res = await fetch(
+          `https://plato.pusan.ac.kr/report/ubcompletion/user_progress_a.php?id=${courseId}`,
+        );
+        const text = await res.text();
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(text, 'text/html');
+        const rows = doc.querySelectorAll('.user_progress_table tbody tr');
+        for (let i = 0; i < rows.length; i += 1) {
+          const title = rows[i].querySelector('td.text-left')?.textContent;
+          // const link = rows[i].querySelector('td.text-left img')?.href;
+          // const dueDate = new Date();
+
+          /**
+           * @todo link, dueDate 정보 가져오기
+           */
+          const link = courseId;
+          const dueDate = new Date();
+
+          const isDone = Array.from(
+            rows[i].querySelectorAll('td.text-center'),
+          ).some((td) => td.textContent === 'O');
+
+          if (title !== undefined) {
+            const content = '임시 데이터';
+            result.push(
+              new Assignment(
+                title,
+                content,
+                link,
+                dueDate,
+                ASSIGNMENT_TYPE.VIDEO,
+                isDone,
+              ),
+            );
+          }
+        }
+        resolve(result);
+      })();
+    });
+  });
+
+  const result = await Promise.all(promises);
+  return result.flat();
+};
 
 /**
  * zoom 정보를 가져온다.
