@@ -140,7 +140,9 @@ const getVideoInfo = async (courseIdList) => {
         const doc = parser.parseFromString(text, 'text/html');
         const rows = doc.querySelectorAll('.user_progress_table tbody tr');
         for (let i = 0; i < rows.length; i += 1) {
-          const title = rows[i].querySelector('td.text-left')?.textContent;
+          const title = rows[i]
+            .querySelector('td.text-left')
+            ?.textContent.trim();
           // const link = rows[i].querySelector('td.text-left img')?.href;
           // const dueDate = new Date();
 
@@ -236,10 +238,20 @@ const getInfo = async () => {
     '.my-course-lists > li > .course-box > a',
   );
 
-  const courseIdList = [];
-  for (let i = 0; i < courseLinkList.length; i += 1) {
-    courseIdList.push(courseLinkList[i].href.split('?id=')[1]);
-  }
+  const courseIdList = [
+    '140487',
+    '140494',
+    '140499',
+    '140522',
+    '140527',
+    '140529',
+    '140533',
+    '127012',
+  ];
+  // const courseIdList = [];
+  // for (let i = 0; i < courseLinkList.length; i += 1) {
+  //   courseIdList.push(courseLinkList[i].href.split('?id=')[1]);
+  // }
 
   console.log(`my courseIdList: ${courseIdList.toString()}`);
 
