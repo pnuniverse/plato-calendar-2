@@ -1,0 +1,99 @@
+<div class="calendar">
+  <header class="calendar-header">
+    <div>
+      <img id="loadingImg" src="img/loading.png" alt="로딩중" />
+      <div id="re-rendering">동기화 시작 (10초 정도 소요)</div>
+    </div>
+    <div>
+      <img id="left" src="img/left.png" alt="저번달" />
+      <div id="year">2024년 2월</div>
+      <img id="rigth" src="img/right.png" alt="다음달" />
+    </div>
+    <div style="display: block">
+      <div>아이콘 클릭시, 해당 아이콘이 달력에서 숨겨집니다.</div>
+      <div class="icon-grid">
+        <div class="custom_chbox" id="video_box">
+          <input type="checkbox" id="video_check" />
+          <label for="video_check">
+            <img id="video" src="img/video.png" alt="video" />
+          </label>
+        </div>
+        <div class="custom_chbox" id="zoom_box">
+          <input type="checkbox" id="zoom_check" />
+          <label for="zoom_check">
+            <img id="zoom" src="img/zoom.png" alt="video" />
+          </label>
+        </div>
+        <div class="custom_chbox" id="homework_box">
+          <input type="checkbox" id="homework_check" />
+          <label for="homework_check">
+            <img id="homework" src="img/homework.png" alt="video" />
+          </label>
+        </div>
+        <div class="custom_chbox" id="quiz_box">
+          <input type="checkbox" id="quiz_check" />
+          <label for="quiz_check">
+            <img id="quiz" src="img/quiz.png" alt="video" />
+          </label>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="calendar-content">
+    <ul class="weekdays">
+      <li>월</li>
+      <li>화</li>
+      <li>수</li>
+      <li>목</li>
+      <li>금</li>
+      <li>토</li>
+      <li>일</li>
+    </ul>
+    <ul class="week" id="firstWeek">
+      <li></li>
+      <li></li>
+      <li></li>
+      <li></li>
+      <li></li>
+      <li></li>
+      <li></li>
+    </ul>
+    <ul class="week" id="secondWeek">
+      <li></li>
+      <li></li>
+      <li></li>
+      <li></li>
+      <li></li>
+      <li></li>
+      <li></li>
+    </ul>
+    <ul class="week" id="thirdWeek">
+      <li></li>
+      <li></li>
+      <li></li>
+      <li></li>
+      <li></li>
+      <li></li>
+      <li></li>
+    </ul>
+    <ul class="week" id="fourthWeek">
+      <li></li>
+      <li></li>
+      <li></li>
+      <li></li>
+      <li></li>
+      <li></li>
+      <li></li>
+    </ul>
+    <ul class="week" id="fifthWeek">
+      <li></li>
+      <li></li>
+      <li></li>
+      <li></li>
+      <li></li>
+      <li></li>
+      <li></li>
+    </ul>
+  </div>
+</div>

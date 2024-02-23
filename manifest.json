@@ -13,5 +13,23 @@
       "css": ["assets/style.css"],
       "js": ["content-script.js"]
     }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "assets/img/down.png",
+        "assets/img/up.png",
+        "assets/img/left.png",
+        "assets/img/loading.png",
+        "assets/img/right.png",
+        "assets/img/homework.png",
+        "assets/img/quiz.png",
+        "assets/img/video.png",
+        "assets/img/zoom.png",
+        "assets/calendar.html",
+        "assets/style.css"
+      ],
+      "matches": ["https://plato.pusan.ac.kr/*"]
+    }
   ]
 }
