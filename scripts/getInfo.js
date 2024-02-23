@@ -143,19 +143,11 @@ const getVideoInfo = async (courseIdList) => {
           const title = rows[i]
             .querySelector('td.text-left')
             ?.textContent.trim();
-          // const link = rows[i].querySelector('td.text-left img')?.href;
-          // const dueDate = new Date();
-
-          /**
-           * @todo link, dueDate 정보 가져오기
-           */
-          const link = courseId;
-          const dueDate = new Date();
-
+          const link = null;
+          const dueDate = null;
           const isDone = Array.from(
             rows[i].querySelectorAll('td.text-center'),
           ).some((td) => td.textContent === 'O');
-
           if (title !== undefined) {
             result.push(
               new Assignment(
@@ -173,8 +165,69 @@ const getVideoInfo = async (courseIdList) => {
     });
   });
 
-  const result = await Promise.all(promises);
-  return result.flat();
+  const otherInfoPromises = courseIdList.map((courseId, index) => {
+    const videoAssignmentsPromises = [];
+    return new Promise((resolve) => {
+      fetch(`https://plato.pusan.ac.kr/mod/vod/index.php?id=${courseId}`)
+        .then((res) => res.text())
+        .then((text) => {
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(text, 'text/html');
+          const rows = doc.querySelectorAll('tbody tr');
+          for (let i = 0; i < rows.length; i += 1) {
+            const title = rows[i]
+              .querySelector('.cell.c1 a')
+              ?.textContent.trim();
+            const videoId = rows[i]
+              .querySelector('.cell.c1 a')
+              ?.href.split('id=')[1];
+            if (videoId !== undefined) {
+              const link = `https://plato.pusan.ac.kr/mod/vod/view.php?id=${videoId}`;
+              videoAssignmentsPromises.push(
+                new Promise((resolve2) => {
+                  fetch(link)
+                    .then((response) => response.text())
+                    .then((resp) => {
+                      const d = parser.parseFromString(resp, 'text/html');
+                      const date =
+                        d.querySelectorAll('.vod_info_value')[1]?.textContent;
+
+                      resolve2({
+                        title,
+                        link,
+                        dueDate: new Date(date),
+                      });
+                    });
+                }),
+              );
+            }
+          }
+        });
+      resolve(videoAssignmentsPromises);
+    });
+  });
+
+  const assignments = (await Promise.all(promises)).flat();
+  const videoAssignmentWithOtherInfo = (
+    await Promise.all((await Promise.all(otherInfoPromises)).flat())
+  ).flat();
+
+  const result = [];
+
+  videoAssignmentWithOtherInfo.forEach((item) => {
+    const index = assignments.findIndex(
+      (assignment) => assignment.title === item.title,
+    );
+    if (index !== -1) {
+      result.push({
+        ...assignments[index],
+        link: item.link,
+        dueDate: item.dueDate,
+      });
+    }
+  });
+
+  return result;
 };
 
 /**
@@ -238,22 +291,12 @@ const getInfo = async () => {
     '.my-course-lists > li > .course-box > a',
   );
 
-  const courseIdList = [
-    '140487',
-    '140494',
-    '140499',
-    '140522',
-    '140527',
-    '140529',
-    '140533',
-    '127012',
-  ];
-  // const courseIdList = [];
-  // for (let i = 0; i < courseLinkList.length; i += 1) {
-  //   courseIdList.push(courseLinkList[i].href.split('?id=')[1]);
-  // }
+  const courseIdList = [];
+  for (let i = 0; i < courseLinkList.length; i += 1) {
+    courseIdList.push(courseLinkList[i].href.split('?id=')[1]);
+  }
 
-  console.log(`my courseIdList: ${courseIdList.toString()}`);
+  // console.log(`my courseIdList: ${courseIdList.toString()}`);
 
   const result = await Promise.all([
     getHomeworkInfo(courseIdList),
