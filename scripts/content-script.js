@@ -23,7 +23,7 @@ async function createCalendar() {
   return new Promise((reslove, reject) => {
     let link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = chrome.runtime.getURL('/assets/style.css');
+    link.href = chrome.runtime.getURL('/assets/prev-style.css');
     document.head.appendChild(link);
 
     let calendarURL = chrome.runtime.getURL('/assets/calendar.html');

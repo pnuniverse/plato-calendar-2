@@ -1,83 +1,80 @@
 <div class="calendar">
   <header class="calendar-header">
     <div>
-      <img id="loadingImg" src="img/loading.png" alt="로딩중" />
-      <div id="re-rendering">동기화 시작 (10초 정도 소요)</div>
+      <img id="prevMonth" src="${left}" alt="저번달" />
+      <div id="thisMonth">2024년 2월</div>
+      <img id="nextMonth" src="${right}" alt="다음달" />
     </div>
-    <div>
-      <img id="left" src="img/left.png" alt="저번달" />
-      <div id="year">2024년 2월</div>
-      <img id="rigth" src="img/right.png" alt="다음달" />
-    </div>
-    <div style="display: block">
-      <div>아이콘 클릭시, 해당 아이콘이 달력에서 숨겨집니다.</div>
-      <div class="icon-grid">
-        <div class="custom_chbox" id="video_box">
-          <input type="checkbox" id="video_check" />
-          <label for="video_check">
-            <img id="video" src="img/video.png" alt="video" />
-          </label>
+    <div class="calendar-header-info">
+      <div>
+        <div class="calendar-header-info-icons">
+          <div id="video_box">
+            <input type="checkbox" id="video_check" />
+            <label for="video_check">
+              <img id="video" src="${video}" alt="video" />
+            </label>
+          </div>
+          <div id="zoom_box">
+            <input type="checkbox" id="zoom_check" />
+            <label for="zoom_check">
+              <img id="zoom" src="${zoom}" alt="video" />
+            </label>
+          </div>
+          <div id="homework_box">
+            <input type="checkbox" id="homework_check" />
+            <label for="homework_check">
+              <img id="homework" src="${homework}" alt="video" />
+            </label>
+          </div>
+          <div id="quiz_box">
+            <input type="checkbox" id="quiz_check" />
+            <label for="quiz_check">
+              <img id="quiz" src="${quiz}" alt="video" />
+            </label>
+          </div>
+          <div>
+            눌러서<br />
+            숨기기
+          </div>
         </div>
-        <div class="custom_chbox" id="zoom_box">
-          <input type="checkbox" id="zoom_check" />
-          <label for="zoom_check">
-            <img id="zoom" src="img/zoom.png" alt="video" />
-          </label>
-        </div>
-        <div class="custom_chbox" id="homework_box">
-          <input type="checkbox" id="homework_check" />
-          <label for="homework_check">
-            <img id="homework" src="img/homework.png" alt="video" />
-          </label>
-        </div>
-        <div class="custom_chbox" id="quiz_box">
-          <input type="checkbox" id="quiz_check" />
-          <label for="quiz_check">
-            <img id="quiz" src="img/quiz.png" alt="video" />
-          </label>
-        </div>
+      </div>
+      <div>
+        <img id="loadingImg" src="assets/img/loading.png" alt="로딩중" />
+        <div id="re-rendering">동기화 (10s)</div>
       </div>
     </div>
   </header>
 
   <div class="calendar-content">
-    <ul class="weekdays">
-      <li>월</li>
-      <li>화</li>
-      <li>수</li>
-      <li>목</li>
-      <li>금</li>
-      <li>토</li>
-      <li>일</li>
+    <ul class="calendar-content-weekdays">
+      <li>Mon</li>
+      <li>Tue</li>
+      <li>Wed</li>
+      <li>Thu</li>
+      <li>Fri</li>
+      <li>Sat</li>
+      <li>Sun</li>
     </ul>
-    <ul class="week" id="firstWeek">
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-    </ul>
-    <ul class="week" id="secondWeek">
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-    </ul>
-    <ul class="week" id="thirdWeek">
-      <li></li>
-      <li></li>
+    <ul class="calendar-content-week" id="firstWeek">
+      <li>
+        <div class="calendar-content-week-icon video">0/4</div>
+        <div class="calendar-content-week-icon zoom">0/4</div>
+        <div class="calendar-content-week-icon homeWork">0/4</div>
+        <div class="calendar-content-week-icon quiz">0/4</div>
+      </li>
+      <li>
+        <div class="calendar-content-week-icon video">0/4</div>
+        <div class="calendar-content-week-icon zoom hidden">0/4</div>
+        <div class="calendar-content-week-icon homeWork">0/4</div>
+        <div class="calendar-content-week-icon quiz">0/4</div>
+      </li>
       <li></li>
       <li></li>
       <li></li>
       <li></li>
       <li></li>
     </ul>
-    <ul class="week" id="fourthWeek">
+    <ul class="calendar-content-week" id="secondWeek">
       <li></li>
       <li></li>
       <li></li>
@@ -86,7 +83,7 @@
       <li></li>
       <li></li>
     </ul>
-    <ul class="week" id="fifthWeek">
+    <ul class="calendar-content-week" id="thirdWeek">
       <li></li>
       <li></li>
       <li></li>
@@ -95,5 +92,66 @@
       <li></li>
       <li></li>
     </ul>
+    <ul class="calendar-content-week" id="fourthWeek">
+      <li></li>
+      <li></li>
+      <li></li>
+      <li></li>
+      <li></li>
+      <li></li>
+      <li></li>
+    </ul>
+    <ul class="calendar-content-week" id="fifthWeek">
+      <li></li>
+      <li></li>
+      <li></li>
+      <li></li>
+      <li></li>
+      <li></li>
+      <li></li>
+    </ul>
+  </div>
+  <div>
+    <!-- <div class="calendarModal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <div class="modal-content-card">
+          <img src="img/homework.png" alt="homework" />
+          <div>
+            <div>강좌 이름1</div>
+            <div>13:59:59</div>
+            <div>강의 동영상1</div>
+            <div>6일 11:49:27</div>
+          </div>
+        </div>
+        <div class="modal-content-card">
+          <img src="img/homework.png" alt="homework" />
+          <div>
+            <div>강좌 이름1</div>
+            <div>13:59:59</div>
+            <div>강의 동영상1</div>
+            <div>6일 11:49:27</div>
+          </div>
+        </div>
+        <div class="modal-content-card">
+          <img src="img/homework.png" alt="homework" />
+          <div>
+            <div>강좌 이름1</div>
+            <div>13:59:59</div>
+            <div>강의 동영상1</div>
+            <div>6일 11:49:27</div>
+          </div>
+        </div>
+        <div class="modal-content-card">
+          <img src="img/homework.png" alt="homework" />
+          <div>
+            <div>강좌 이름1</div>
+            <div>13:59:59</div>
+            <div>강의 동영상1</div>
+            <div>6일 11:49:27</div>
+          </div>
+        </div>
+      </div>
+    </div> -->
   </div>
 </div>
