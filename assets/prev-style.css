@@ -13,24 +13,26 @@
 /* calendar-container */
 #plato_calendar-container {
   display: flex;
-  height: 40px;
   width: 100%;
   margin-bottom: 10px;
-  background-color: var(--pnuColor);
   border-radius: 5px;
   justify-content: start;
   align-items: center;
   padding-left: 10px;
-  color: white;
-  position: relative;
+  flex-direction: column;
   font-family: 'Noto Sans KR', sans-serif;
+}
+
+#plato_calendar-title {
+  width: 100%;
+  height: 40px;
+  background-color: var(--pnuColor);
+  color: black;
 }
 
 /* calendar */
 .calendar {
-  position: absolute;
-  top: 20px;
-  left: 0;
+  height: 800px;
   color: black;
   width: 100%;
 }
