@@ -10,6 +10,15 @@
   --zoom: #3891ff;
 }
 
+summary {
+  width: 100%;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: medium;
+  background-color: var(--pnuColor);
+  color: white;
+}
+
 /* calendar-container */
 #plato_calendar-container {
   display: flex;
@@ -23,16 +32,9 @@
   font-family: 'Noto Sans KR', sans-serif;
 }
 
-#plato_calendar-title {
-  width: 100%;
-  height: 40px;
-  background-color: var(--pnuColor);
-  color: black;
-}
-
 /* calendar */
 .calendar {
-  height: 800px;
+  height: fit-content;
   color: black;
   width: 100%;
 }
@@ -43,7 +45,7 @@
   justify-content: space-between;
   align-items: end;
   margin: 10px;
-  height: 90px;
+  height: fit-content;
 }
 .calendar-header div {
   display: flex;
@@ -82,16 +84,6 @@
   align-items: end;
 }
 
-.calendar-header-info-icons > div:last-child {
-  margin-left: 10px;
-  color: lightgray;
-  font-size: 15px;
-}
-
-/* .calendar-header-info-icons input[type="checkbox"] {
-    visibility: hidden;
-  } */
-
 .calendar-header-info-icons label {
   display: flex;
   justify-content: center;
@@ -102,6 +94,7 @@
   position: absolute;
   width: 22px;
   vertical-align: middle;
+  visibility: hidden;
 }
 
 .calendar-header-info-icons img {
@@ -152,11 +145,16 @@
 }
 
 .calendar-content-week li {
-  display: grid;
-  grid-template-rows: 52px 52px;
-  grid-template-columns: 52px 52px;
+  display: flex;
+  justify-content: space-between;
   align-content: end;
-  height: 128px;
+  height: 96px;
+}
+
+.calendar-content-week li > div {
+  display: grid;
+  grid-template-rows: 40px 40px;
+  grid-template-columns: 40px 40px;
 }
 
 .calendar-content-week li:hover {
@@ -168,8 +166,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   border-radius: 8px;
   color: white;
   font-weight: bold;
@@ -252,10 +250,10 @@
 }
 
 .modal-content-card > div {
-  display: grid;
+  /* display: grid;
   grid-template-columns: 1fr 1fr;
   width: 90%;
-  margin-left: 20px;
+  margin-left: 20px; */
 }
 
 .modal-content-card > div > div:nth-child(even) {
