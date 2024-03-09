@@ -4,7 +4,6 @@ import getInfo from './getInfo';
 
 console.log('content-script.js loaded');
 sidePanel();
-getInfo();
 
 const selectedDate = new Date();
 
