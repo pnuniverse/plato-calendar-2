@@ -14,7 +14,7 @@
       "js": ["content-script.js"]
     }
   ],
-  "permissions": ["tabs"],
+  "permissions": ["tabs", "storage"],
   "web_accessible_resources": [
     {
       "resources": [

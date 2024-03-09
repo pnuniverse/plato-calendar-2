@@ -1,17 +1,16 @@
 import sidePanel from './side-panel';
 import getInfo from './getInfo';
-// let calendarboxToggle;
 
-console.log('content-script.js loaded');
 sidePanel();
 
 const selectedDate = new Date();
+let assignmentData = [];
+let isLoading = true;
 
 /**
  * 셀 렌더링 함수
  */
 function renderCell(cell, date) {
-  console.log(cell, date);
   const spanCell = document.createElement('span');
   const divCell = document.createElement('div');
 
@@ -33,7 +32,6 @@ function loadCalendarDate({ year, month }) {
   const startDay = (firstDay.getDay() + 6) % 7; // 3/1 (토:6)
 
   const calendar = document.querySelectorAll('.calendar-content-week>li');
-  console.log(calendar);
   for (let i = startDay; i < lastDay.getDate() + startDay; i += 1) {
     renderCell(calendar[i], i - startDay + 1);
   }
@@ -102,10 +100,41 @@ async function initCalendar() {
   // updateCalendar(); //
 }
 
+/**
+ * 캘린더 데이터 로드
+ */
+async function loadCalendarData() {
+  isLoading = true;
+  const { asyncTimeJSON } = await chrome.storage.local.get('asyncTimeJSON');
+
+  if (
+    !asyncTimeJSON ||
+    (asyncTimeJSON && new Date() - new Date(asyncTimeJSON) > 1000 * 60 * 60)
+  ) {
+    const info = await getInfo();
+    assignmentData = info;
+    await chrome.storage.local.set({
+      asyncTimeJSON: new Date().toJSON(),
+      info: JSON.stringify(info),
+    });
+    return;
+  }
+
+  const { info } = await chrome.storage.local.get('info');
+  assignmentData = JSON.parse(info);
+  isLoading = false;
+  await chrome.storage.local.set({
+    asyncTimeJSON: new Date().toJSON(),
+    info: JSON.stringify(assignmentData),
+  });
+}
+
 window.onload = () => {
   if (!document.getElementsByClassName('front-box front-box-pmooc').length)
     return;
+
   initCalendar();
+  loadCalendarData();
 };
 
 // const initPopup = () => {};
