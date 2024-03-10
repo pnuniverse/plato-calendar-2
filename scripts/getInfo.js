@@ -1,7 +1,7 @@
 /**
  * @enum {{ HOMEWORK: string, QUIZ: string, VIDEO: string, ZOOM: string }} ASSIGNMENT_TYPE
  */
-const ASSIGNMENT_TYPE = {
+export const ASSIGNMENT_TYPE = {
   HOMEWORK: 'homework',
   QUIZ: 'quiz',
   VIDEO: 'video',
@@ -282,7 +282,7 @@ const getZoomInfo = async (courseIdList) => {
  * 모든 과제(homework, quiz, video, zoom) 정보를 가져온다.
  * @returns { Promise<Assignment[]> }
  */
-const getInfo = async () => {
+export const getInfo = async () => {
   const res = await fetch('https://plato.pusan.ac.kr');
   const text = await res.text();
   const parser = new DOMParser();
@@ -306,5 +306,3 @@ const getInfo = async () => {
   ]);
   return result.flat();
 };
-
-export default getInfo;

@@ -19,6 +19,10 @@ summary {
   color: white;
 }
 
+a:visited {
+  text-decoration: none;
+}
+
 /* calendar-container */
 #plato_calendar-container {
   display: flex;
@@ -32,8 +36,23 @@ summary {
   font-family: 'Noto Sans KR', sans-serif;
 }
 
+#prevMonth:hover {
+  background: var(--borderColor);
+  transition: ease-in-out 0.5s;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+#nextMonth:hover {
+  background: var(--borderColor);
+  transition: ease-in-out 0.5s;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
 /* calendar */
 .calendar {
+  position: relative;
   height: fit-content;
   color: black;
   width: 100%;
@@ -157,9 +176,13 @@ summary {
   grid-template-columns: 40px 40px;
 }
 
-.calendar-content-week li:hover {
+/* .calendar-content-week li:hover {
   background: var(--borderColor);
   transition: ease-in-out 0.5s;
+} */
+
+.calendar-content-week li > div > div:hover {
+  cursor: pointer;
 }
 
 .calendar-content-week-icon {
@@ -190,14 +213,14 @@ summary {
 }
 
 /* Modal */
-.calendarModal {
-  display: flex;
+#calendarModal {
+  display: none;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   position: absolute;
-  bottom: 0;
-  left: 0;
+  align-self: center;
+  top: 0;
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.3);
@@ -215,7 +238,7 @@ summary {
   max-width: 500px;
   height: 50%;
   border-radius: 20px;
-  background-color: var(--backgroundColor);
+  background-color: red;
   box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
 }
 
@@ -234,7 +257,6 @@ summary {
 
 .modal-content-card {
   display: flex;
-  justify-content: space-between;
   align-items: center;
   width: 80%;
   margin-bottom: 10px;
@@ -249,24 +271,17 @@ summary {
   object-fit: fill;
 }
 
-.modal-content-card > div {
-  /* display: grid;
-  grid-template-columns: 1fr 1fr;
-  width: 90%;
-  margin-left: 20px; */
-}
-
-.modal-content-card > div > div:nth-child(even) {
+/* .modal-content-card > div > div:nth-child(even) {
   text-align: right;
   color: var(--textColor);
-}
+} */
 
-.modal-content-card > div > div:first-child {
+/* .modal-content-card > div > div:first-child {
   font-size: small;
   color: lightslategray;
-}
+} */
 
-.modal-content-card > div > div:nth-child(3) {
+/* .modal-content-card > div > div:nth-child(3) {
   font-weight: bold;
   color: var(--textColor);
-}
+} */
