@@ -220,6 +220,7 @@ async function loadCalendarData() {
       asyncTimeJSON: new Date().toJSON(),
       info: JSON.stringify(info),
     });
+    console.log('info: ', info);
     return;
   }
   const { info } = await chrome.storage.local.get('info');
