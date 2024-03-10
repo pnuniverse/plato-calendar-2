@@ -16,14 +16,18 @@ export const ASSIGNMENT_TYPE = {
  * @property { Date } dueDate - 과제 마감일
  * @property { string } type - 과제 유형 (homework, quiz, video, zoom)
  * @property { boolean } isDone - 과제 완료 여부
+ * @property { string } courseId - 강의 id
+ * @property { string } courseName - 강의명
  */
 class Assignment {
-  constructor(title, link, dueDate, type, isDone) {
+  constructor(title, link, dueDate, type, isDone, courseId, courseName) {
     this.title = title;
     this.link = link;
     this.dueDate = dueDate;
     this.type = type;
     this.isDone = isDone;
+    this.courseId = courseId;
+    this.courseName = courseName;
   }
 }
 
@@ -61,6 +65,7 @@ const getHomeworkInfo = async (courseIdList) => {
                 dueDate,
                 ASSIGNMENT_TYPE.HOMEWORK,
                 isDone,
+                courseId,
               ),
             );
           }
@@ -109,6 +114,7 @@ const getQuizInfo = async (courseIdList) => {
                 dueDate,
                 ASSIGNMENT_TYPE.QUIZ,
                 isDone,
+                courseId,
               ),
             );
           }
@@ -156,6 +162,7 @@ const getVideoInfo = async (courseIdList) => {
                 dueDate,
                 ASSIGNMENT_TYPE.VIDEO,
                 isDone,
+                courseId,
               ),
             );
           }
@@ -265,6 +272,7 @@ const getZoomInfo = async (courseIdList) => {
                 dueDate,
                 ASSIGNMENT_TYPE.ZOOM,
                 isDone,
+                courseId,
               ),
             );
           }
@@ -290,13 +298,16 @@ export const getInfo = async () => {
   const courseLinkList = doc.querySelectorAll(
     '.my-course-lists > li > .course-box > a',
   );
+  const courseNameNodes = doc.querySelectorAll(
+    '.my-course-lists > li > .course-box > a .course-title h3',
+  );
 
   const courseIdList = [];
+  const courseNameList = [];
   for (let i = 0; i < courseLinkList.length; i += 1) {
     courseIdList.push(courseLinkList[i].href.split('?id=')[1]);
+    courseNameList.push(courseNameNodes[i].textContent.trim());
   }
-
-  // console.log(`my courseIdList: ${courseIdList.toString()}`);
 
   const result = await Promise.all([
     getHomeworkInfo(courseIdList),
@@ -304,5 +315,12 @@ export const getInfo = async () => {
     getVideoInfo(courseIdList),
     getZoomInfo(courseIdList),
   ]);
-  return result.flat();
+  const assignments = result.flat();
+
+  return assignments.map((assignment) => {
+    return {
+      ...assignment,
+      courseName: courseNameList[courseIdList.indexOf(assignment.courseId)],
+    };
+  });
 };
