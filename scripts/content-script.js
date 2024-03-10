@@ -18,11 +18,12 @@ function openModal(data) {
 
   modalContent.innerHTML = '';
   closeBtn.className = 'close';
-  closeBtn.innerText = 'X';
+  closeBtn.innerText = 'x';
   closeBtn.addEventListener('click', () => {
     modal.style.display = 'none';
   });
-  modalContent.appendChild(closeBtn);
+  modalContent.appendChild(closeBtn); // 닫기 버튼 추가
+
   data.forEach((assignment) => {
     const link = document.createElement('a');
     const img = document.createElement('img');
@@ -35,7 +36,7 @@ function openModal(data) {
     img.alt = `${assignment.type} icon`;
     contentDiv.innerHTML = `
     <div>${assignment.title}</div>
-    <div>마감일 : ${assignment.dueDate.getFullYear()}-${assignment.dueDate.getMonth()}-${assignment.dueDate.getDate()}  ${assignment.dueDate.getHours()} : ${assignment.dueDate.getMinutes()}</div>
+    <div>마감일 : ${assignment.dueDate.getFullYear()}-${assignment.dueDate.getMonth()}-${assignment.dueDate.getDate()}  ${assignment.dueDate.getHours()}:${assignment.dueDate.getMinutes()}</div>
     `;
     link.appendChild(img);
     link.appendChild(contentDiv);
@@ -58,7 +59,6 @@ function renderCell(cell, date) {
     );
   });
   const typeData = Object.groupBy(dateData, ({ type }) => type);
-  console.log('typeData: ', typeData);
 
   const homeWork = typeData[ASSIGNMENT_TYPE.HOMEWORK] || [];
   const video = typeData[ASSIGNMENT_TYPE.VIDEO] || [];
@@ -107,9 +107,15 @@ function loadCalendarDate({ year, month }) {
   const lastDay = new Date(year, month, 0); // 3/31 (일:0)
   const startDay = (firstDay.getDay() + 6) % 7; // 3/1 (토:6)
   const calendar = document.querySelectorAll('.calendar-content-week>li');
+  for (let i = 0; i < startDay; i += 1) {
+    calendar[i].innerHTML = '';
+  }
   for (let i = startDay; i < lastDay.getDate() + startDay; i += 1) {
     calendar[i].innerHTML = '';
     renderCell(calendar[i], i - startDay + 1);
+  }
+  for (let i = lastDay.getDate() + startDay; i < calendar.length; i += 1) {
+    calendar[i].innerHTML = '';
   }
   const disMonth = document.querySelector('#thisMonth');
   disMonth.innerText = `${year}년 ${month}월`;
