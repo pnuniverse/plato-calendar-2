@@ -107,8 +107,10 @@ function loadCalendarDate({ year, month }) {
   const lastDay = new Date(year, month, 0); // 3/31 (일:0)
   const startDay = (firstDay.getDay() + 6) % 7; // 3/1 (토:6)
   const calendar = document.querySelectorAll('.calendar-content-week>li');
-  for (let i = startDay; i < lastDay.getDate() + startDay; i += 1) {
+  for (let i = 0; i < calendar.length; i += 1) {
     calendar[i].innerHTML = '';
+  }
+  for (let i = startDay; i < lastDay.getDate() + startDay; i += 1) {
     renderCell(calendar[i], i - startDay + 1);
   }
   const disMonth = document.querySelector('#thisMonth');
