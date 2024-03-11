@@ -8,6 +8,28 @@ let assignmentData = [];
 let isLoading = true;
 
 /**
+ * 모달창 과목 이름만 보여주기
+ */
+function extractText(input) {
+  const startIndex = input.indexOf('(');
+  const endIndex = input.indexOf(')');
+
+  let output;
+
+  if (startIndex !== -1 && endIndex !== -1) {
+    output = input.substring(0, startIndex);
+  } else {
+    output = input;
+  }
+
+  if (output.length > 11) {
+    output = `${output.substring(0, 11)}...`;
+  }
+
+  return output;
+}
+
+/**
  * 모달 열기
  * @param { Assignment[] } data - 과제 정보
  */
@@ -35,8 +57,9 @@ function openModal(data) {
     img.src = typeImg;
     img.alt = `${assignment.type} icon`;
     contentDiv.innerHTML = `
-    <div>${assignment.title}</div>
-    <div>마감일 : ${assignment.dueDate.getFullYear()}-${assignment.dueDate.getMonth()}-${assignment.dueDate.getDate()}  ${assignment.dueDate.getHours()}:${assignment.dueDate.getMinutes()}</div>
+    <div style="overflow:hidden">${assignment.title}</div>
+    <div style="overflow:hidden">${extractText(assignment.courseName)}</div>
+    <div> 마감일 ${assignment.dueDate.getFullYear()}-${assignment.dueDate.getMonth()}-${assignment.dueDate.getDate()}  ${assignment.dueDate.getHours().toString().padStart(2, '0')}:${assignment.dueDate.getMinutes().toString().padStart(2, '0')}</div>
     `;
     link.appendChild(img);
     link.appendChild(contentDiv);
@@ -102,7 +125,7 @@ function renderCell(cell, date) {
 /**
  * 캘린더 날자 로드
  */
-function loadCalendarDate({ year, month }) {
+async function loadCalendarDate({ year, month }) {
   const firstDay = new Date(year, month - 1, 1); // 3/1 (토:6)
   const lastDay = new Date(year, month, 0); // 3/31 (일:0)
   const startDay = (firstDay.getDay() + 6) % 7; // 3/1 (토:6)
@@ -156,6 +179,7 @@ async function createCalendar() {
 
         const leftBtn = calendar.querySelector('#prevMonth');
         const rightBtn = calendar.querySelector('#nextMonth');
+        const loadingBtn = calendar.querySelector('#re-rendering');
 
         leftBtn.addEventListener('click', () => {
           selectedDate.setMonth(selectedDate.getMonth() - 1);
@@ -170,6 +194,15 @@ async function createCalendar() {
             year: selectedDate.getFullYear(),
             month: selectedDate.getMonth() + 1,
           });
+        });
+        loadingBtn.addEventListener('click', async () => {
+          if (isLoading) return;
+          loadingBtn.style.cursor = 'wait';
+          await loadCalendarDate({
+            year: selectedDate.getFullYear(),
+            month: selectedDate.getMonth() + 1,
+          });
+          loadingBtn.style.cursor = 'pointer';
         });
 
         summary.innerText = 'Plato Calendar 2';
@@ -190,16 +223,11 @@ async function createCalendar() {
 }
 
 async function initCalendar() {
-  // asset/calendar.html (5줄 캘린더 형태까지 html 구현)
   await createCalendar();
   loadCalendarDate({
     year: selectedDate.getFullYear(),
     month: selectedDate.getMonth() + 1,
   });
-
-  // initPopup();
-  // eventListener 등록
-  // updateCalendar(); //
 }
 
 /**
@@ -207,9 +235,9 @@ async function initCalendar() {
  */
 async function loadCalendarData() {
   isLoading = true;
+  // chrome.storage.local.clear();
   await chrome.storage.local.get(console.log);
   const { asyncTimeJSON } = await chrome.storage.local.get('asyncTimeJSON');
-
   if (
     !asyncTimeJSON ||
     (asyncTimeJSON && new Date() - new Date(asyncTimeJSON) > 1000 * 60 * 60)
@@ -224,6 +252,7 @@ async function loadCalendarData() {
     return;
   }
   const { info } = await chrome.storage.local.get('info');
+  console.log('info2: ', info);
   assignmentData = JSON.parse(info);
   assignmentData = assignmentData.map((data) => {
     return { ...data, dueDate: new Date(data.dueDate) };
@@ -241,16 +270,3 @@ window.onload = async () => {
   await loadCalendarData();
   initCalendar();
 };
-
-// const initPopup = () => {};
-
-// const updateCalendar = () => {
-//   const data = dataLoad();
-//   //html안에 넣어야 할것 (event역할)
-// };
-
-// const dataLoad = () => {
-//   return [Assignment, Assignment, Assignment, Assignment, Assignment];
-// };
-
-// //style 적용 잘해두기

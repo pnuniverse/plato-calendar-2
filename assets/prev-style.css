@@ -174,12 +174,9 @@ a:visited {
   display: grid;
   grid-template-rows: 40px 40px;
   grid-template-columns: 40px 40px;
+  align-items: center;
+  justify-content: center;
 }
-
-/* .calendar-content-week li:hover {
-  background: var(--borderColor);
-  transition: ease-in-out 0.5s;
-} */
 
 .calendar-content-week li > div > div:hover {
   cursor: pointer;
@@ -189,8 +186,8 @@ a:visited {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   border-radius: 8px;
   color: white;
   font-weight: bold;
@@ -237,7 +234,7 @@ a:visited {
   width: 50%;
   max-width: 500px;
   height: 50%;
-  border-radius: 20px;
+  border-radius: 32px;
   background-color: var(--backgroundColor) !important;
 }
 
@@ -262,6 +259,12 @@ a:visited {
   border-radius: 20px;
   padding: 20px;
   background-color: white;
+  text-decoration: none;
+}
+
+.modal-content-card:hover {
+  background: var(--borderColor);
+  transition: ease-in-out 0.5s;
 }
 
 .modal-content-card > img {
@@ -270,17 +273,24 @@ a:visited {
   margin-right: 10px;
 }
 
-/* .modal-content-card > div > div:nth-child(even) {
-  text-align: right;
-  color: var(--textColor);
-} */
+.modal-content-card > div {
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  grid-template-columns: 1fr 1fr;
+  width: 100%;
+}
 
-/* .modal-content-card > div > div:first-child {
-  font-size: small;
-  color: lightslategray;
-} */
+.modal-content-card > div > div {
+  color: var(--textColor) !important;
+}
 
-/* .modal-content-card > div > div:nth-child(3) {
-  font-weight: bold;
-  color: var(--textColor);
-} */
+.modal-content-card > div > div:first-child {
+  grid-column: 1 / span 2;
+  color: black !important;
+  font-weight: bold !important;
+}
+
+.modal-content-card > div > div:nth-child(2) {
+  width: 90%;
+  text-wrap: nowrap;
+}
