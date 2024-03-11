@@ -31,6 +31,7 @@ function openModal(data) {
 
     link.className = 'modal-content-card';
     link.href = assignment.link;
+    link.target = '_blank';
     img.src = typeImg;
     img.alt = `${assignment.type} icon`;
     contentDiv.innerHTML = `
