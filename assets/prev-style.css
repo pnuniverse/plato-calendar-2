@@ -19,10 +19,6 @@ summary {
   color: white;
 }
 
-a:visited {
-  text-decoration: none;
-}
-
 /* calendar-container */
 #plato_calendar-container {
   display: flex;
@@ -238,7 +234,6 @@ a:visited {
   max-width: 500px;
   height: 50%;
   border-radius: 20px;
-  background-color: red;
   box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
 }
 
@@ -262,13 +257,18 @@ a:visited {
   margin-bottom: 10px;
   border-radius: 20px;
   padding: 20px;
-  background-color: white;
+  background-color: whitesmoke;
 }
 
 .modal-content-card > img {
   width: 40px;
   height: 40px;
   object-fit: fill;
+  margin-right: 15px;
+}
+
+.modal-content-card h3 {
+  font-size: large;
 }
 
 /* .modal-content-card > div > div:nth-child(even) {
