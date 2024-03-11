@@ -8,6 +8,28 @@ const selectedDate = new Date();
 let assignmentData = [];
 
 /**
+ * 모달창 텍스트 관리
+ */
+function extractText(input) {
+  const startIndex = input.indexOf('(');
+  const endIndex = input.indexOf(')');
+
+  let output;
+
+  if (startIndex !== -1 && endIndex !== -1) {
+    output = input.substring(0, startIndex);
+  } else {
+    output = input;
+  }
+
+  if (output.length > 10) {
+    output = `${output.substring(0, 10)}...`;
+  }
+
+  return output;
+}
+
+/**
  * 모달 열기
  * @param { Assignment[] } data - 과제 정보
  */
@@ -154,7 +176,7 @@ async function createCalendar() {
 
         const leftBtn = calendar.querySelector('#prevMonth');
         const rightBtn = calendar.querySelector('#nextMonth');
-        const loadingBtn = calendar.querySelector('#re-rendering');
+        // const loadingBtn = calendar.querySelector('#re-rendering');
 
         leftBtn.addEventListener('click', () => {
           selectedDate.setMonth(selectedDate.getMonth() - 1);
@@ -170,15 +192,15 @@ async function createCalendar() {
             month: selectedDate.getMonth() + 1,
           });
         });
-        loadingBtn.addEventListener('click', async () => {
-          if (isLoading) return;
-          loadingBtn.style.cursor = 'wait';
-          await loadCalendarDate({
-            year: selectedDate.getFullYear(),
-            month: selectedDate.getMonth() + 1,
-          });
-          loadingBtn.style.cursor = 'pointer';
-        });
+        // loadingBtn.addEventListener('click', async () => {
+        //   if (isLoading) return;
+        //   loadingBtn.style.cursor = 'wait';
+        //   await loadCalendarDate({
+        //     year: selectedDate.getFullYear(),
+        //     month: selectedDate.getMonth() + 1,
+        //   });
+        //   loadingBtn.style.cursor = 'pointer';
+        // });
 
         summary.innerText = 'Plato Calendar 2';
         toggle.appendChild(summary);
