@@ -1,11 +1,11 @@
 import sidePanel from './side-panel';
 import { getInfo, ASSIGNMENT_TYPE } from './getInfo';
+import Loading from './loading';
 
 sidePanel();
 
 const selectedDate = new Date();
 let assignmentData = [];
-let isLoading = true;
 
 /**
  * 모달 열기
@@ -188,10 +188,6 @@ async function createCalendar() {
 async function initCalendar() {
   // asset/calendar.html (5줄 캘린더 형태까지 html 구현)
   await createCalendar();
-  loadCalendarDate({
-    year: selectedDate.getFullYear(),
-    month: selectedDate.getMonth() + 1,
-  });
 
   // initPopup();
   // eventListener 등록
@@ -202,7 +198,6 @@ async function initCalendar() {
  * 캘린더 데이터 로드
  */
 async function loadCalendarData() {
-  isLoading = true;
   await chrome.storage.local.get(console.log);
   const { asyncTimeJSON } = await chrome.storage.local.get('asyncTimeJSON');
 
@@ -224,7 +219,6 @@ async function loadCalendarData() {
   assignmentData = assignmentData.map((data) => {
     return { ...data, dueDate: new Date(data.dueDate) };
   });
-  isLoading = false;
   await chrome.storage.local.set({
     asyncTimeJSON: new Date().toJSON(),
     info: JSON.stringify(assignmentData),
@@ -234,8 +228,15 @@ async function loadCalendarData() {
 window.onload = async () => {
   if (!document.getElementsByClassName('front-box front-box-pmooc').length)
     return;
-  await loadCalendarData();
-  initCalendar();
+  await initCalendar();
+  Loading.show();
+  loadCalendarData().then(() => {
+    loadCalendarDate({
+      year: selectedDate.getFullYear(),
+      month: selectedDate.getMonth() + 1,
+    });
+    Loading.hide();
+  });
 };
 
 // const initPopup = () => {};

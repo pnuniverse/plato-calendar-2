@@ -10,7 +10,7 @@
   "content_scripts": [
     {
       "matches": ["https://plato.pusan.ac.kr/*"],
-      "css": ["assets/prev-style.css"],
+      "css": ["assets/prev-style.css", "assets/loader.css"],
       "js": ["content-script.js"]
     }
   ],
