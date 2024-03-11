@@ -35,9 +35,8 @@ function openModal(data) {
     img.src = typeImg;
     img.alt = `${assignment.type} icon`;
     contentDiv.innerHTML = `
-    <h3>강의명: ${assignment.courseName}</h3>
-    <div>과제명: ${assignment.title}</div>
-    <div>마감일: ${assignment.dueDate.getFullYear()}-${assignment.dueDate.getMonth()}-${assignment.dueDate.getDate()}  ${assignment.dueDate.getHours()}:${assignment.dueDate.getMinutes()}</div>
+    <div>${assignment.title}</div>
+    <div>마감일 : ${assignment.dueDate.getFullYear()}-${assignment.dueDate.getMonth()}-${assignment.dueDate.getDate()}  ${assignment.dueDate.getHours()} : ${assignment.dueDate.getMinutes()}</div>
     `;
     link.appendChild(img);
     link.appendChild(contentDiv);
