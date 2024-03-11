@@ -1,33 +1,11 @@
 import sidePanel from './side-panel';
 import { getInfo, ASSIGNMENT_TYPE } from './getInfo';
+import Loading from './loading';
 
 sidePanel();
 
 const selectedDate = new Date();
 let assignmentData = [];
-let isLoading = true;
-
-/**
- * 모달창 과목 이름만 보여주기
- */
-function extractText(input) {
-  const startIndex = input.indexOf('(');
-  const endIndex = input.indexOf(')');
-
-  let output;
-
-  if (startIndex !== -1 && endIndex !== -1) {
-    output = input.substring(0, startIndex);
-  } else {
-    output = input;
-  }
-
-  if (output.length > 11) {
-    output = `${output.substring(0, 11)}...`;
-  }
-
-  return output;
-}
 
 /**
  * 모달 열기
@@ -54,6 +32,7 @@ function openModal(data) {
 
     link.className = 'modal-content-card';
     link.href = assignment.link;
+    link.target = '_blank';
     img.src = typeImg;
     img.alt = `${assignment.type} icon`;
     contentDiv.innerHTML = `
@@ -130,15 +109,11 @@ async function loadCalendarDate({ year, month }) {
   const lastDay = new Date(year, month, 0); // 3/31 (일:0)
   const startDay = (firstDay.getDay() + 6) % 7; // 3/1 (토:6)
   const calendar = document.querySelectorAll('.calendar-content-week>li');
-  for (let i = 0; i < startDay; i += 1) {
+  for (let i = 0; i < calendar.length; i += 1) {
     calendar[i].innerHTML = '';
   }
   for (let i = startDay; i < lastDay.getDate() + startDay; i += 1) {
-    calendar[i].innerHTML = '';
     renderCell(calendar[i], i - startDay + 1);
-  }
-  for (let i = lastDay.getDate() + startDay; i < calendar.length; i += 1) {
-    calendar[i].innerHTML = '';
   }
   const disMonth = document.querySelector('#thisMonth');
   disMonth.innerText = `${year}년 ${month}월`;
@@ -224,18 +199,16 @@ async function createCalendar() {
 
 async function initCalendar() {
   await createCalendar();
-  loadCalendarDate({
-    year: selectedDate.getFullYear(),
-    month: selectedDate.getMonth() + 1,
-  });
+
+  // initPopup();
+  // eventListener 등록
+  // updateCalendar(); //
 }
 
 /**
  * 캘린더 데이터 로드
  */
 async function loadCalendarData() {
-  isLoading = true;
-  // chrome.storage.local.clear();
   await chrome.storage.local.get(console.log);
   const { asyncTimeJSON } = await chrome.storage.local.get('asyncTimeJSON');
   if (
@@ -257,7 +230,6 @@ async function loadCalendarData() {
   assignmentData = assignmentData.map((data) => {
     return { ...data, dueDate: new Date(data.dueDate) };
   });
-  isLoading = false;
   await chrome.storage.local.set({
     asyncTimeJSON: new Date().toJSON(),
     info: JSON.stringify(assignmentData),
@@ -267,6 +239,26 @@ async function loadCalendarData() {
 window.onload = async () => {
   if (!document.getElementsByClassName('front-box front-box-pmooc').length)
     return;
-  await loadCalendarData();
-  initCalendar();
+  await initCalendar();
+  Loading.show();
+  loadCalendarData().then(() => {
+    loadCalendarDate({
+      year: selectedDate.getFullYear(),
+      month: selectedDate.getMonth() + 1,
+    });
+    Loading.hide();
+  });
 };
+
+// const initPopup = () => {};
+
+// const updateCalendar = () => {
+//   const data = dataLoad();
+//   //html안에 넣어야 할것 (event역할)
+// };
+
+// const dataLoad = () => {
+//   return [Assignment, Assignment, Assignment, Assignment, Assignment];
+// };
+
+// //style 적용 잘해두기
