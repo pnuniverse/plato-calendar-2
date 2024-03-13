@@ -85,6 +85,11 @@ function renderCell(cell, date) {
   const zoom = typeData[ASSIGNMENT_TYPE.ZOOM] || [];
   const quiz = typeData[ASSIGNMENT_TYPE.QUIZ] || [];
 
+  const homeWorkDone = homeWork.filter((item) => !item.isDone);
+  const videoDone = video.filter((item) => !item.isDone);
+  const zoomDone = zoom.filter((item) => !item.isDone);
+  const quizDone = quiz.filter((item) => !item.isDone);
+
   const homeWorkDiv = document.createElement('div');
   const videoDiv = document.createElement('div');
   const zoomDiv = document.createElement('div');
@@ -92,39 +97,39 @@ function renderCell(cell, date) {
 
   if (homeWork.every((item) => item.isDone)) {
     homeWorkDiv.className = 'calendar-content-week-icon done-assignment';
+    homeWorkDiv.innerHTML = `${homeWork.length}`;
   } else {
     homeWorkDiv.className = 'calendar-content-week-icon homeWork';
   }
 
   if (video.every((item) => item.isDone)) {
     videoDiv.className = 'calendar-content-week-icon done-assignment';
+    videoDiv.innerHTML = `${video.length}`;
   } else {
     videoDiv.className = 'calendar-content-week-icon video';
   }
 
   if (zoom.every((item) => item.isDone)) {
     zoomDiv.className = 'calendar-content-week-icon done-assignment';
+    zoomDiv.innerHTML = `${zoom.length}`;
   } else {
     zoomDiv.className = 'calendar-content-week-icon zoom';
   }
 
   if (quiz.every((item) => item.isDone)) {
     quizDiv.className = 'calendar-content-week-icon done-assignment';
+    quizDiv.innerHTML = `${quiz.length}`;
   } else {
     quizDiv.className = 'calendar-content-week-icon quiz';
   }
 
-  if (homeWork.length > 0)
-    homeWorkDiv.innerText = `${homeWork.filter((item) => !item.isDone).length}`;
+  if (homeWorkDone.length > 0) homeWorkDiv.innerText = `${homeWorkDone.length}`;
   else homeWorkDiv.style.visibility = 'hidden';
-  if (video.length > 0)
-    videoDiv.innerText = `${video.filter((item) => !item.isDone).length}`;
+  if (videoDone.length > 0) videoDiv.innerText = `${videoDone.length}`;
   else videoDiv.style.visibility = 'hidden';
-  if (zoom.length > 0)
-    zoomDiv.innerText = `${zoom.filter((item) => !item.isDone).length}`;
+  if (zoomDone.length > 0) zoomDiv.innerText = `${zoomDone.length}`;
   else zoomDiv.style.visibility = 'hidden';
-  if (quiz.length > 0)
-    quizDiv.innerText = `${quiz.filter((item) => !item.isDone).length}`;
+  if (quizDone.length > 0) quizDiv.innerText = `${quizDone.length}`;
   else quizDiv.style.visibility = 'hidden';
 
   homeWorkDiv.addEventListener('click', () => openModal(homeWork));
