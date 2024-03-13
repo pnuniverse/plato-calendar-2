@@ -174,7 +174,7 @@ const getVideoInfo = async (courseIdList) => {
     });
   });
 
-  const otherInfoPromises = courseIdList.map((courseId, index) => {
+  const otherInfoPromises = courseIdList.map((courseId) => {
     const videoAssignmentsPromises = [];
     return new Promise((resolve) => {
       fetch(`https://plato.pusan.ac.kr/mod/vod/index.php?id=${courseId}`)
@@ -233,6 +233,7 @@ const getVideoInfo = async (courseIdList) => {
         link: item.link,
         dueDate: item.dueDate,
       });
+      assignments.splice(index, 1);
     }
   });
 
