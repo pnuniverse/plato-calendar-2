@@ -138,6 +138,19 @@ async function loadCalendarDate({ year, month }) {
   disMonth.innerText = `${year}년 ${month}월`;
 }
 
+function setRenderBtn(time = 60) {
+  const renderBtnText = document.querySelector('#re-rendering > div');
+  let clock = Math.ceil(time);
+  const timer = setInterval(() => {
+    clock -= 1;
+    renderBtnText.innerText = `동기화 (${clock})`;
+    if (clock <= 0) {
+      clearInterval(timer);
+      renderBtnText.innerText = '동기화 (가능)';
+    }
+  }, 1000);
+}
+
 async function reRenderCalendar() {
   Loading.show();
 
@@ -152,6 +165,7 @@ async function reRenderCalendar() {
       asyncTimeJSON: new Date().toJSON(),
       info: JSON.stringify(info),
     });
+    setRenderBtn();
     Loading.hide();
     return;
   }
@@ -270,6 +284,7 @@ async function loadCalendarData() {
       asyncTimeJSON: new Date().toJSON(),
       info: JSON.stringify(info),
     });
+    setRenderBtn(60);
     return;
   }
 
@@ -284,6 +299,9 @@ async function loadCalendarData() {
     asyncTimeJSON,
     info: JSON.stringify(assignmentData),
   });
+
+  const timeInterval = (new Date() - new Date(asyncTimeJSON)) / 1000;
+  setRenderBtn(timeInterval > 60 ? 0 : 60 - timeInterval);
 }
 
 window.onload = async () => {
