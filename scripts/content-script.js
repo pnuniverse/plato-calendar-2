@@ -281,7 +281,7 @@ async function loadCalendarData() {
   });
 
   await chrome.storage.local.set({
-    asyncTimeJSON: new Date().toJSON(),
+    asyncTimeJSON,
     info: JSON.stringify(assignmentData),
   });
 }
