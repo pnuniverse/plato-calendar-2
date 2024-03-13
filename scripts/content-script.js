@@ -114,13 +114,17 @@ function renderCell(cell, date) {
     quizDiv.className = 'calendar-content-week-icon quiz';
   }
 
-  if (homeWork.length > 0) homeWorkDiv.innerText = `${homeWork.length}`;
+  if (homeWork.length > 0)
+    homeWorkDiv.innerText = `${homeWork.filter((item) => !item.isDone).length}`;
   else homeWorkDiv.style.visibility = 'hidden';
-  if (video.length > 0) videoDiv.innerText = `${video.length}`;
+  if (video.length > 0)
+    videoDiv.innerText = `${video.filter((item) => !item.isDone).length}`;
   else videoDiv.style.visibility = 'hidden';
-  if (zoom.length > 0) zoomDiv.innerText = `${zoom.length}`;
+  if (zoom.length > 0)
+    zoomDiv.innerText = `${zoom.filter((item) => !item.isDone).length}`;
   else zoomDiv.style.visibility = 'hidden';
-  if (quiz.length > 0) quizDiv.innerText = `${quiz.length}`;
+  if (quiz.length > 0)
+    quizDiv.innerText = `${quiz.filter((item) => !item.isDone).length}`;
   else quizDiv.style.visibility = 'hidden';
 
   homeWorkDiv.addEventListener('click', () => openModal(homeWork));
