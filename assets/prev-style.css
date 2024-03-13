@@ -50,6 +50,10 @@ a:visited {
   cursor: pointer;
 }
 
+#re-rendering:hover {
+  cursor: pointer;
+}
+
 /* calendar */
 .calendar {
   position: relative;
