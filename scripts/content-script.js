@@ -87,42 +87,45 @@ function renderCell(cell, date) {
   const zoomDiv = document.createElement('div');
   const quizDiv = document.createElement('div');
 
-  if (homeWork.every((item) => item.isDone)) {
-    homeWorkDiv.className = 'calendar-content-week-icon done-assignment';
-  } else {
-    homeWorkDiv.className = 'calendar-content-week-icon homeWork';
-  }
+  if (homeWork.length > 0) {
+    if (homeWork.every((item) => item.isDone)) {
+      homeWorkDiv.className = 'calendar-content-week-icon done-assignment';
+      homeWorkDiv.innerText = `${homeWork.length}`;
+    } else {
+      homeWorkDiv.className = 'calendar-content-week-icon homeWork';
+      homeWorkDiv.innerText = `${homeWork.filter((item) => !item.isDone).length}`;
+    }
+  } else homeWorkDiv.style.visibility = 'hidden';
 
-  if (video.every((item) => item.isDone)) {
-    videoDiv.className = 'calendar-content-week-icon done-assignment';
-  } else {
-    videoDiv.className = 'calendar-content-week-icon video';
-  }
+  if (video.length > 0) {
+    if (video.every((item) => item.isDone)) {
+      videoDiv.className = 'calendar-content-week-icon done-assignment';
+      videoDiv.innerText = `${video.length}`;
+    } else {
+      videoDiv.className = 'calendar-content-week-icon video';
+      videoDiv.innerText = `${video.filter((item) => !item.isDone).length}`;
+    }
+  } else videoDiv.style.visibility = 'hidden';
 
-  if (zoom.every((item) => item.isDone)) {
-    zoomDiv.className = 'calendar-content-week-icon done-assignment';
-  } else {
-    zoomDiv.className = 'calendar-content-week-icon zoom';
-  }
+  if (zoom.length > 0) {
+    if (zoom.every((item) => item.isDone)) {
+      zoomDiv.className = 'calendar-content-week-icon done-assignment';
+      zoomDiv.innerText = `${zoom.length}`;
+    } else {
+      zoomDiv.className = 'calendar-content-week-icon zoom';
+      zoomDiv.innerText = `${zoom.filter((item) => !item.isDone).length}`;
+    }
+  } else zoomDiv.style.visibility = 'hidden';
 
-  if (quiz.every((item) => item.isDone)) {
-    quizDiv.className = 'calendar-content-week-icon done-assignment';
-  } else {
-    quizDiv.className = 'calendar-content-week-icon quiz';
-  }
-
-  if (homeWork.length > 0)
-    homeWorkDiv.innerText = `${homeWork.filter((item) => !item.isDone).length}`;
-  else homeWorkDiv.style.visibility = 'hidden';
-  if (video.length > 0)
-    videoDiv.innerText = `${video.filter((item) => !item.isDone).length}`;
-  else videoDiv.style.visibility = 'hidden';
-  if (zoom.length > 0)
-    zoomDiv.innerText = `${zoom.filter((item) => !item.isDone).length}`;
-  else zoomDiv.style.visibility = 'hidden';
-  if (quiz.length > 0)
-    quizDiv.innerText = `${quiz.filter((item) => !item.isDone).length}`;
-  else quizDiv.style.visibility = 'hidden';
+  if (quiz.length > 0) {
+    if (quiz.every((item) => item.isDone)) {
+      quizDiv.className = 'calendar-content-week-icon done-assignment';
+      quizDiv.innerText = `${quiz.length}`;
+    } else {
+      quizDiv.className = 'calendar-content-week-icon quiz';
+      quizDiv.innerText = `${quiz.filter((item) => !item.isDone).length}`;
+    }
+  } else quizDiv.style.visibility = 'hidden';
 
   homeWorkDiv.addEventListener('click', () => openModal(homeWork));
   videoDiv.addEventListener('click', () => openModal(video));
