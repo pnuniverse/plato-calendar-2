@@ -1,8 +1,5 @@
-import sidePanel from './side-panel';
 import { getInfo, ASSIGNMENT_TYPE } from './getInfo';
 import Loading from './loading';
-
-sidePanel();
 
 const selectedDate = new Date();
 let assignmentData = [];
@@ -11,7 +8,7 @@ let assignmentData = [];
  * data row 모달창에 생성하는 함수
  */
 function createModalContent(assignment) {
-  console.log('assign : ', assignment);
+  // console.log('assign : ', assignment);
   const link = document.createElement('a');
   const img = document.createElement('img');
   const contentDiv = document.createElement('div');
