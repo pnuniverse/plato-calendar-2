@@ -72,10 +72,29 @@ function renderCell(cell, date) {
   const zoomDiv = document.createElement('div');
   const quizDiv = document.createElement('div');
 
-  homeWorkDiv.className = 'calendar-content-week-icon homeWork';
-  videoDiv.className = 'calendar-content-week-icon video';
-  zoomDiv.className = 'calendar-content-week-icon zoom';
-  quizDiv.className = 'calendar-content-week-icon quiz';
+  if (homeWork.every((item) => item.isDone)) {
+    homeWorkDiv.className = 'calendar-content-week-icon done-assignment';
+  } else {
+    homeWorkDiv.className = 'calendar-content-week-icon homeWork';
+  }
+
+  if (video.every((item) => item.isDone)) {
+    videoDiv.className = 'calendar-content-week-icon done-assignment';
+  } else {
+    videoDiv.className = 'calendar-content-week-icon video';
+  }
+
+  if (zoom.every((item) => item.isDone)) {
+    zoomDiv.className = 'calendar-content-week-icon done-assignment';
+  } else {
+    zoomDiv.className = 'calendar-content-week-icon zoom';
+  }
+
+  if (quiz.every((item) => item.isDone)) {
+    quizDiv.className = 'calendar-content-week-icon done-assignment';
+  } else {
+    quizDiv.className = 'calendar-content-week-icon quiz';
+  }
 
   if (homeWork.length > 0) homeWorkDiv.innerText = `${homeWork.length}`;
   else homeWorkDiv.style.visibility = 'hidden';
