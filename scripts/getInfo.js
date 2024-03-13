@@ -308,7 +308,7 @@ export const getInfo = async () => {
   const courseNameList = [];
   for (let i = 0; i < courseLinkList.length; i += 1) {
     courseIdList.push(courseLinkList[i].href.split('?id=')[1]);
-    courseNameList.push(courseNameNodes[i].textContent.split(' ')[0].trim());
+    courseNameList.push(courseNameNodes[i].textContent.split('(')[0].trim());
   }
 
   const result = await Promise.all([
