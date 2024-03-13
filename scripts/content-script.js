@@ -38,7 +38,7 @@ function openModal(data) {
     contentDiv.innerHTML = `
     <div style="overflow:hidden">${assignment.title}</div>
     <div style="overflow:hidden">${assignment.courseName}</div>
-    <div> 마감일 ${assignment.dueDate.getFullYear()}-${assignment.dueDate.getMonth()}-${assignment.dueDate.getDate()}  ${assignment.dueDate.getHours().toString().padStart(2, '0')}:${assignment.dueDate.getMinutes().toString().padStart(2, '0')}</div>
+    <div> 마감일 ${assignment.dueDate.getFullYear()}-${assignment.dueDate.getMonth() + 1}-${assignment.dueDate.getDate()}  ${assignment.dueDate.getHours().toString().padStart(2, '0')}:${assignment.dueDate.getMinutes().toString().padStart(2, '0')}</div>
     `;
     link.appendChild(img);
     link.appendChild(contentDiv);
@@ -72,10 +72,29 @@ function renderCell(cell, date) {
   const zoomDiv = document.createElement('div');
   const quizDiv = document.createElement('div');
 
-  homeWorkDiv.className = 'calendar-content-week-icon homeWork';
-  videoDiv.className = 'calendar-content-week-icon video';
-  zoomDiv.className = 'calendar-content-week-icon zoom';
-  quizDiv.className = 'calendar-content-week-icon quiz';
+  if (homeWork.every((item) => item.isDone)) {
+    homeWorkDiv.className = 'calendar-content-week-icon done-assignment';
+  } else {
+    homeWorkDiv.className = 'calendar-content-week-icon homeWork';
+  }
+
+  if (video.every((item) => item.isDone)) {
+    videoDiv.className = 'calendar-content-week-icon done-assignment';
+  } else {
+    videoDiv.className = 'calendar-content-week-icon video';
+  }
+
+  if (zoom.every((item) => item.isDone)) {
+    zoomDiv.className = 'calendar-content-week-icon done-assignment';
+  } else {
+    zoomDiv.className = 'calendar-content-week-icon zoom';
+  }
+
+  if (quiz.every((item) => item.isDone)) {
+    quizDiv.className = 'calendar-content-week-icon done-assignment';
+  } else {
+    quizDiv.className = 'calendar-content-week-icon quiz';
+  }
 
   if (homeWork.length > 0) homeWorkDiv.innerText = `${homeWork.length}`;
   else homeWorkDiv.style.visibility = 'hidden';
