@@ -163,10 +163,10 @@ async function reRenderCalendar() {
     return { ...data, dueDate: new Date(data.dueDate) };
   });
 
-  await chrome.storage.local.set({
-    asyncTimeJSON: new Date().toJSON(),
-    info: JSON.stringify(assignmentData),
-  });
+  // await chrome.storage.local.set({
+  //   asyncTimeJSON: new Date().toJSON(),
+  //   info: JSON.stringify(assignmentData),
+  // });
 
   await loadCalendarDate({
     year: selectedDate.getFullYear(),
