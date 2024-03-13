@@ -15,8 +15,10 @@
 
 ### 스크린샷
 
-<img src="./description/1.png" width="400px" height="300px" />
-<img src="./description/2.png" width="400px" height="300px" />
+<div style="display: flex">
+  <img src="./description/1.png" width="400px" height="300px" />
+  <img src="./description/2.png" width="400px" height="300px" />
+</div>
 
 ### 참고
 
@@ -36,9 +38,9 @@
     </td>
     <td align="center">
       <a href="https://github.com/mun-kyeong">
-      <img src="https://github.com/	mun-kyeong.png" width="80" alt="	mun-kyeong"/>
+      <img src="https://github.com/mun-kyeong.png" width="80" alt="mun-kyeong"/>
       <br />
-      <sub><b>	mun-kyeong</b></sub>
+      <sub><b>mun-kyeong</b></sub>
       </a>
       <br />
     </td>
