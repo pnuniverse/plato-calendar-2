@@ -138,6 +138,43 @@ async function loadCalendarDate({ year, month }) {
   disMonth.innerText = `${year}년 ${month}월`;
 }
 
+async function reRenderCalendar() {
+  Loading.show();
+
+  const { asyncTimeJSON } = await chrome.storage.local.get('asyncTimeJSON');
+  if (
+    !asyncTimeJSON ||
+    (asyncTimeJSON && new Date() - new Date(asyncTimeJSON) > 1000 * 60)
+  ) {
+    const info = await getInfo();
+    assignmentData = info;
+    await chrome.storage.local.set({
+      asyncTimeJSON: new Date().toJSON(),
+      info: JSON.stringify(info),
+    });
+    Loading.hide();
+    return;
+  }
+
+  const { info } = await chrome.storage.local.get('info');
+
+  assignmentData = JSON.parse(info);
+  assignmentData = assignmentData.map((data) => {
+    return { ...data, dueDate: new Date(data.dueDate) };
+  });
+
+  await chrome.storage.local.set({
+    asyncTimeJSON: new Date().toJSON(),
+    info: JSON.stringify(assignmentData),
+  });
+
+  await loadCalendarDate({
+    year: selectedDate.getFullYear(),
+    month: selectedDate.getMonth() + 1,
+  });
+  Loading.hide();
+}
+
 /**
  * 캘린더 생성
  */
@@ -173,7 +210,7 @@ async function createCalendar() {
 
         const leftBtn = calendar.querySelector('#prevMonth');
         const rightBtn = calendar.querySelector('#nextMonth');
-        // const loadingBtn = calendar.querySelector('#re-rendering');
+        const reRenderBtn = calendar.querySelector('#re-rendering');
 
         leftBtn.addEventListener('click', () => {
           selectedDate.setMonth(selectedDate.getMonth() - 1);
@@ -189,15 +226,9 @@ async function createCalendar() {
             month: selectedDate.getMonth() + 1,
           });
         });
-        // loadingBtn.addEventListener('click', async () => {
-        //   if (isLoading) return;
-        //   loadingBtn.style.cursor = 'wait';
-        //   await loadCalendarDate({
-        //     year: selectedDate.getFullYear(),
-        //     month: selectedDate.getMonth() + 1,
-        //   });
-        //   loadingBtn.style.cursor = 'pointer';
-        // });
+        reRenderBtn.addEventListener('click', () => {
+          reRenderCalendar();
+        });
 
         summary.innerText = 'Plato Calendar 2';
         toggle.appendChild(summary);
@@ -228,7 +259,6 @@ async function initCalendar() {
  * 캘린더 데이터 로드
  */
 async function loadCalendarData() {
-  await chrome.storage.local.get(console.log);
   const { asyncTimeJSON } = await chrome.storage.local.get('asyncTimeJSON');
   if (
     !asyncTimeJSON ||
@@ -240,15 +270,16 @@ async function loadCalendarData() {
       asyncTimeJSON: new Date().toJSON(),
       info: JSON.stringify(info),
     });
-    console.log('info: ', info);
     return;
   }
+
   const { info } = await chrome.storage.local.get('info');
-  console.log('info2: ', info);
+
   assignmentData = JSON.parse(info);
   assignmentData = assignmentData.map((data) => {
     return { ...data, dueDate: new Date(data.dueDate) };
   });
+
   await chrome.storage.local.set({
     asyncTimeJSON: new Date().toJSON(),
     info: JSON.stringify(assignmentData),
