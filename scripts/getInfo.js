@@ -55,7 +55,9 @@ const getHomeworkInfo = async (courseIdList) => {
             rows[i].querySelector('td.cell.c2')?.innerHTML,
           );
           const isDone =
-            rows[i].querySelector('td.cell.c3')?.innerHTML === '제출 완료';
+            rows[i].querySelector('td.cell.c3')?.innerHTML === '제출 완료' ||
+            rows[i].querySelector('td.cell.c3')?.innerHTML ===
+              'Submitted for grading';
 
           if (title !== undefined) {
             result.push(
