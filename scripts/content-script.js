@@ -197,6 +197,10 @@ async function reRenderCalendar() {
       info: JSON.stringify(info),
     });
     setRenderBtn();
+    await loadCalendarDate({
+      year: selectedDate.getFullYear(),
+      month: selectedDate.getMonth() + 1,
+    });
     Loading.hide();
     return;
   }
