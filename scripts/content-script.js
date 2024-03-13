@@ -153,6 +153,7 @@ async function loadCalendarDate({ year, month }) {
   const calendar = document.querySelectorAll('.calendar-content-week>li');
   for (let i = 0; i < calendar.length; i += 1) {
     calendar[i].innerHTML = '';
+    calendar[i].style.backgroundColor = 'var(--backgroundColor)';
   }
   for (let i = startDay; i < lastDay.getDate() + startDay; i += 1) {
     renderCell(calendar[i], i - startDay + 1);
