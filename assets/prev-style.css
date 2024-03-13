@@ -133,7 +133,7 @@ a:visited {
   justify-content: space-between;
   width: 100%;
   margin-bottom: 0;
-  background-color: white;
+  background-color: var(--backgroundColor);
 }
 
 .calendar-content ul {
@@ -259,6 +259,10 @@ a:visited {
   font-size: 20px;
 }
 
+.modal-content-header {
+  cursor: pointer;
+}
+
 .modal-content-card {
   display: flex;
   align-items: center;
@@ -301,4 +305,8 @@ a:visited {
 .modal-content-card > div > div:nth-child(2) {
   width: 90%;
   text-wrap: nowrap;
+}
+
+.done-modal-card {
+  background-color: var(--borderColor) !important;
 }
