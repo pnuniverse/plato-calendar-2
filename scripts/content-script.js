@@ -8,28 +8,6 @@ const selectedDate = new Date();
 let assignmentData = [];
 
 /**
- * 모달창 텍스트 관리
- */
-function extractText(input) {
-  const startIndex = input.indexOf('(');
-  const endIndex = input.indexOf(')');
-
-  let output;
-
-  if (startIndex !== -1 && endIndex !== -1) {
-    output = input.substring(0, startIndex);
-  } else {
-    output = input;
-  }
-
-  if (output.length > 10) {
-    output = `${output.substring(0, 10)}...`;
-  }
-
-  return output;
-}
-
-/**
  * 모달 열기
  * @param { Assignment[] } data - 과제 정보
  */
@@ -59,7 +37,7 @@ function openModal(data) {
     img.alt = `${assignment.type} icon`;
     contentDiv.innerHTML = `
     <div style="overflow:hidden">${assignment.title}</div>
-    <div style="overflow:hidden">${extractText(assignment.courseName)}</div>
+    <div style="overflow:hidden">${assignment.courseName}</div>
     <div> 마감일 ${assignment.dueDate.getFullYear()}-${assignment.dueDate.getMonth()}-${assignment.dueDate.getDate()}  ${assignment.dueDate.getHours().toString().padStart(2, '0')}:${assignment.dueDate.getMinutes().toString().padStart(2, '0')}</div>
     `;
     link.appendChild(img);
