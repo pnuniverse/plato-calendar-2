@@ -38,7 +38,7 @@ function openModal(data) {
     contentDiv.innerHTML = `
     <div style="overflow:hidden">${assignment.title}</div>
     <div style="overflow:hidden">${assignment.courseName}</div>
-    <div> 마감일 ${assignment.dueDate.getFullYear()}-${assignment.dueDate.getMonth()}-${assignment.dueDate.getDate()}  ${assignment.dueDate.getHours().toString().padStart(2, '0')}:${assignment.dueDate.getMinutes().toString().padStart(2, '0')}</div>
+    <div> 마감일 ${assignment.dueDate.getFullYear()}-${assignment.dueDate.getMonth() + 1}-${assignment.dueDate.getDate()}  ${assignment.dueDate.getHours().toString().padStart(2, '0')}:${assignment.dueDate.getMinutes().toString().padStart(2, '0')}</div>
     `;
     link.appendChild(img);
     link.appendChild(contentDiv);
