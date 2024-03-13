@@ -8,6 +8,34 @@ const selectedDate = new Date();
 let assignmentData = [];
 
 /**
+ * data row 모달창에 생성하는 함수
+ */
+function createModalContent(assignment) {
+  console.log('assign : ', assignment);
+  const link = document.createElement('a');
+  const img = document.createElement('img');
+  const contentDiv = document.createElement('div');
+  let typeImg = chrome.runtime.getURL(`/assets/img/${assignment.type}.png`);
+  if (assignment.isDone)
+    typeImg = chrome.runtime.getURL(`/assets/img/${assignment.type}Done.png`);
+
+  link.className = 'modal-content-card';
+  if (assignment.isDone) link.classList.add('done-modal-card');
+  link.href = assignment.link;
+  link.target = '_blank';
+  img.src = typeImg;
+  img.alt = `${assignment.type} icon`;
+  contentDiv.innerHTML = `
+    <div style="overflow:hidden">${assignment.title}</div>
+    <div style="overflow:hidden">${assignment.courseName}</div>
+    <div> 마감일 ${assignment.dueDate.getFullYear()}-${assignment.dueDate.getMonth() + 1}-${assignment.dueDate.getDate()}  ${assignment.dueDate.getHours().toString().padStart(2, '0')}:${assignment.dueDate.getMinutes().toString().padStart(2, '0')}</div>
+    `;
+  link.appendChild(img);
+  link.appendChild(contentDiv);
+  return link;
+}
+
+/**
  * 모달 열기
  * @param { Assignment[] } data - 과제 정보
  */
@@ -15,34 +43,24 @@ function openModal(data) {
   const modal = document.querySelector('#calendarModal');
   const modalContent = document.querySelector('.modal-content');
   const closeBtn = document.createElement('span');
+  const DoneData = data.filter((item) => item.isDone);
+  const NotDoneData = data.filter((item) => !item.isDone);
 
   modalContent.innerHTML = '';
-  closeBtn.className = 'close';
+  closeBtn.className = 'modal-content-header';
   closeBtn.innerText = 'x';
   closeBtn.addEventListener('click', () => {
     modal.style.display = 'none';
   });
   modalContent.appendChild(closeBtn); // 닫기 버튼 추가
 
-  data.forEach((assignment) => {
-    const link = document.createElement('a');
-    const img = document.createElement('img');
-    const contentDiv = document.createElement('div');
-    const typeImg = chrome.runtime.getURL(`/assets/img/${assignment.type}.png`);
-
-    link.className = 'modal-content-card';
-    link.href = assignment.link;
-    link.target = '_blank';
-    img.src = typeImg;
-    img.alt = `${assignment.type} icon`;
-    contentDiv.innerHTML = `
-    <div style="overflow:hidden">${assignment.title}</div>
-    <div style="overflow:hidden">${assignment.courseName}</div>
-    <div> 마감일 ${assignment.dueDate.getFullYear()}-${assignment.dueDate.getMonth() + 1}-${assignment.dueDate.getDate()}  ${assignment.dueDate.getHours().toString().padStart(2, '0')}:${assignment.dueDate.getMinutes().toString().padStart(2, '0')}</div>
-    `;
-    link.appendChild(img);
-    link.appendChild(contentDiv);
-    modalContent.appendChild(link);
+  NotDoneData.forEach((assignment) => {
+    const linkObj = createModalContent(assignment);
+    modalContent.appendChild(linkObj);
+  });
+  DoneData.forEach((assignment) => {
+    const linkObj = createModalContent(assignment);
+    modalContent.appendChild(linkObj);
   });
   modal.style.display = 'flex';
 }
@@ -124,6 +142,7 @@ function renderCell(cell, date) {
  * 캘린더 날자 로드
  */
 async function loadCalendarDate({ year, month }) {
+  const today = new Date();
   const firstDay = new Date(year, month - 1, 1); // 3/1 (토:6)
   const lastDay = new Date(year, month, 0); // 3/31 (일:0)
   const startDay = (firstDay.getDay() + 6) % 7; // 3/1 (토:6)
@@ -133,6 +152,13 @@ async function loadCalendarDate({ year, month }) {
   }
   for (let i = startDay; i < lastDay.getDate() + startDay; i += 1) {
     renderCell(calendar[i], i - startDay + 1);
+    if (
+      i - startDay + 1 === today.getDate() &&
+      month === today.getMonth() + 1 &&
+      year === today.getFullYear()
+    )
+      calendar[i].style.backgroundColor = 'var(--borderColor)';
+    else calendar[i].style.backgroundColor = '#fff';
   }
   const disMonth = document.querySelector('#thisMonth');
   disMonth.innerText = `${year}년 ${month}월`;
