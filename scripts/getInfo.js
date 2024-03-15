@@ -177,42 +177,43 @@ const getVideoInfo = async (courseIdList) => {
   const otherInfoPromises = courseIdList.map((courseId) => {
     const videoAssignmentsPromises = [];
     return new Promise((resolve) => {
-      fetch(`https://plato.pusan.ac.kr/mod/vod/index.php?id=${courseId}`)
-        .then((res) => res.text())
-        .then((text) => {
-          const parser = new DOMParser();
-          const doc = parser.parseFromString(text, 'text/html');
-          const rows = doc.querySelectorAll('tbody tr');
-          for (let i = 0; i < rows.length; i += 1) {
-            const title = rows[i]
-              .querySelector('.cell.c1 a')
-              ?.textContent.trim();
-            const videoId = rows[i]
-              .querySelector('.cell.c1 a')
-              ?.href.split('id=')[1];
-            if (videoId !== undefined) {
-              const link = `https://plato.pusan.ac.kr/mod/vod/view.php?id=${videoId}`;
-              videoAssignmentsPromises.push(
-                new Promise((resolve2) => {
-                  fetch(link)
-                    .then((response) => response.text())
-                    .then((resp) => {
-                      const d = parser.parseFromString(resp, 'text/html');
-                      const date =
-                        d.querySelectorAll('.vod_info_value')[1]?.textContent;
+      (async () => {
+        const res = await fetch(
+          `https://plato.pusan.ac.kr/mod/vod/index.php?id=${courseId}`,
+        );
+        const text = await res.text();
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(text, 'text/html');
+        const rows = doc.querySelectorAll('tbody tr');
+        for (let i = 0; i < rows.length; i += 1) {
+          const title = rows[i].querySelector('.cell.c1 a')?.textContent.trim();
+          const videoId = rows[i]
+            .querySelector('.cell.c1 a')
+            ?.href.split('id=')[1];
+          if (videoId !== undefined) {
+            const link = `https://plato.pusan.ac.kr/mod/vod/view.php?id=${videoId}`;
+            videoAssignmentsPromises.push(
+              new Promise((resolve2) => {
+                fetch(link)
+                  .then((response) => response.text())
+                  .then((resp) => {
+                    const d = parser.parseFromString(resp, 'text/html');
+                    const date =
+                      d.querySelectorAll('.vod_info_value')[1]?.textContent;
 
-                      resolve2({
-                        title,
-                        link,
-                        dueDate: new Date(date),
-                      });
+                    resolve2({
+                      title,
+                      link,
+                      dueDate: new Date(date),
                     });
-                }),
-              );
-            }
+                  });
+              }),
+            );
           }
-        });
-      resolve(videoAssignmentsPromises);
+        }
+
+        resolve(videoAssignmentsPromises);
+      })();
     });
   });
 
