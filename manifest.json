@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Plato Calendar 2",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "부산대학교 교육플랫폼 플라토 확장 프로그램",
   "background": {
     "service_worker": "service-worker.js",
