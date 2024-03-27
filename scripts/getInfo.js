@@ -321,6 +321,18 @@ export const getInfo = async () => {
   ]);
   const assignments = result.flat();
 
+  assignments.map((assignment) => {
+    if (
+      assignment.dueDate.getHours() === 0 &&
+      assignment.dueDate.getMinutes() === 0
+    ) {
+      assignment.dueDate.setDate(assignment.dueDate.getDate() - 1);
+      assignment.dueDate.setHours(23);
+      assignment.dueDate.setMinutes(59);
+    }
+    return assignment;
+  });
+
   return assignments.map((assignment) => {
     return {
       ...assignment,
