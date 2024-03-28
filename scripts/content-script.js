@@ -90,25 +90,25 @@ function renderCell(cell, date) {
   if (homeWork.length > 0) {
     const isDone = homeWork.every((item) => item.isDone);
     homeWorkDiv.className = `calendar-content-week-icon ${isDone ? 'done-assignment' : 'homeWork'}`;
-    homeWorkDiv.innerText = `${homeWork.filter((item) => !item.isDone).length}/${homeWork.length}`;
+    homeWorkDiv.innerText = `${homeWork.filter((item) => item.isDone).length}/${homeWork.length}`;
   } else homeWorkDiv.style.visibility = 'hidden';
 
   if (video.length > 0) {
     const isDone = video.every((item) => item.isDone);
     videoDiv.className = `calendar-content-week-icon ${isDone ? 'done-assignment' : 'video'}`;
-    videoDiv.innerText = `${video.filter((item) => !item.isDone).length}/${video.length}`;
+    videoDiv.innerText = `${video.filter((item) => item.isDone).length}/${video.length}`;
   } else videoDiv.style.visibility = 'hidden';
 
   if (zoom.length > 0) {
     const isDone = zoom.every((item) => item.isDone);
     zoomDiv.className = `calendar-content-week-icon ${isDone ? 'done-assignment' : 'zoom'}`;
-    zoomDiv.innerText = `${zoom.filter((item) => !item.isDone).length}/${zoom.length}`;
+    zoomDiv.innerText = `${zoom.filter((item) => item.isDone).length}/${zoom.length}`;
   } else zoomDiv.style.visibility = 'hidden';
 
   if (quiz.length > 0) {
     const isDone = quiz.every((item) => item.isDone);
     quizDiv.className = `calendar-content-week-icon ${isDone ? 'done-assignment' : 'quiz'}`;
-    quizDiv.innerText = `${quiz.filter((item) => !item.isDone).length}/${quiz.length}`;
+    quizDiv.innerText = `${quiz.filter((item) => item.isDone).length}/${quiz.length}`;
   } else quizDiv.style.visibility = 'hidden';
 
   homeWorkDiv.addEventListener('click', () => openModal(homeWork));
