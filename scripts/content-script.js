@@ -131,24 +131,27 @@ function renderCell(cell, date) {
  */
 async function loadCalendarDate({ year, month }) {
   const today = new Date();
-  const firstDay = new Date(year, month - 1, 1); // 3/1 (토:6)
-  const lastDay = new Date(year, month, 0); // 3/31 (일:0)
-  const startDay = (firstDay.getDay() + 6) % 7; // 3/1 (토:6)
+  const firstDay = new Date(year, month - 1, 1);
+  const lastDay = new Date(year, month, 0);
+  const startDay = firstDay.getDay();
+
   const calendar = document.querySelectorAll('.calendar-content-week>li');
   for (let i = 0; i < calendar.length; i += 1) {
     calendar[i].innerHTML = '';
     calendar[i].style.backgroundColor = 'var(--backgroundColor)';
   }
+
   for (let i = startDay; i < lastDay.getDate() + startDay; i += 1) {
     renderCell(calendar[i], i - startDay + 1);
     if (
       i - startDay + 1 === today.getDate() &&
       month === today.getMonth() + 1 &&
       year === today.getFullYear()
-    )
+    ) {
       calendar[i].style.backgroundColor = 'var(--borderColor)';
-    else calendar[i].style.backgroundColor = '#fff';
+    } else calendar[i].style.backgroundColor = '#fff';
   }
+
   const disMonth = document.querySelector('#thisMonth');
   disMonth.innerText = `${year}년 ${month}월`;
 }
