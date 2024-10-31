@@ -249,6 +249,7 @@ async function createCalendar() {
         const reRenderBtn = calendar.querySelector('#re-rendering');
 
         leftBtn.addEventListener('click', () => {
+          selectedDate.setDate(1);
           selectedDate.setMonth(selectedDate.getMonth() - 1);
           loadCalendarDate({
             year: selectedDate.getFullYear(),
@@ -256,6 +257,7 @@ async function createCalendar() {
           });
         });
         rightBtn.addEventListener('click', () => {
+          selectedDate.setDate(1);
           selectedDate.setMonth(selectedDate.getMonth() + 1);
           loadCalendarDate({
             year: selectedDate.getFullYear(),
