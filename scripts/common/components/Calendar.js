@@ -1,5 +1,6 @@
 import HomeWork from '../../domain/homeWork/HomeWork';
 import Quiz from '../../domain/quiz/Quiz';
+import Video from '../../domain/video/Video';
 import getInfo from '../../getInfo';
 import Loading from '../../loading';
 import ASSIGNMENT_TYPE from '../type/assignment.type';
@@ -28,21 +29,14 @@ export default class Calendar {
     const modal = new Modal();
 
     const homeWork = new HomeWork();
+    const video = new Video();
     const quiz = new Quiz();
 
     // -- homework --
     homeWork.openHomeworkModal(typeData, modal, divCell);
 
     // -- video --
-    const video = typeData[ASSIGNMENT_TYPE.VIDEO] || [];
-    const videoDiv = document.createElement('div');
-
-    if (video.length > 0) {
-      const isDone = video.every((item) => item.isDone);
-      videoDiv.className = `calendar-content-week-icon ${isDone ? 'done-assignment' : 'video'}`;
-      videoDiv.innerText = `${video.filter((item) => item.isDone).length}/${video.length}`;
-    } else videoDiv.style.visibility = 'hidden';
-    videoDiv.addEventListener('click', () => modal.openModal(video));
+    video.openVideoModal(typeData, modal, divCell);
 
     // -- zoom --
     const zoom = typeData[ASSIGNMENT_TYPE.ZOOM] || [];
@@ -55,12 +49,10 @@ export default class Calendar {
     } else zoomDiv.style.visibility = 'hidden';
 
     zoomDiv.addEventListener('click', () => modal.openModal(zoom));
+    divCell.appendChild(zoomDiv);
 
     // -- quiz --
     quiz.openQuizModal(typeData, modal, divCell);
-
-    divCell.appendChild(videoDiv);
-    divCell.appendChild(zoomDiv);
 
     spanCell.innerText = date;
 
