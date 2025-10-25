@@ -9,6 +9,7 @@
     "sourceType": "module"
   },
   "rules": {
+    "class-methods-use-this": "off",
     "no-unused-vars": "warn",
     "no-undef": "warn",
     "import/extensions": "off",
