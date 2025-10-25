@@ -1,3 +1,4 @@
+import HomeWork from '../../domain/homeWork/HomeWork';
 import getInfo from '../../getInfo';
 import Loading from '../../loading';
 import ASSIGNMENT_TYPE from '../type/assignment.type';
@@ -23,28 +24,27 @@ export default class Calendar {
       );
     });
     const typeData = Object.groupBy(dateData, ({ type }) => type);
+    const modal = new Modal();
 
-    const homeWork = typeData[ASSIGNMENT_TYPE.HOMEWORK] || [];
+    const homeWork = new HomeWork();
+
+    // -- homework --
+    homeWork.openHomeworkModal(typeData, modal, divCell);
+
+    // -- video --
     const video = typeData[ASSIGNMENT_TYPE.VIDEO] || [];
-    const zoom = typeData[ASSIGNMENT_TYPE.ZOOM] || [];
-    const quiz = typeData[ASSIGNMENT_TYPE.QUIZ] || [];
-
-    const homeWorkDiv = document.createElement('div');
     const videoDiv = document.createElement('div');
-    const zoomDiv = document.createElement('div');
-    const quizDiv = document.createElement('div');
-
-    if (homeWork.length > 0) {
-      const isDone = homeWork.every((item) => item.isDone);
-      homeWorkDiv.className = `calendar-content-week-icon ${isDone ? 'done-assignment' : 'homeWork'}`;
-      homeWorkDiv.innerText = `${homeWork.filter((item) => item.isDone).length}/${homeWork.length}`;
-    } else homeWorkDiv.style.visibility = 'hidden';
 
     if (video.length > 0) {
       const isDone = video.every((item) => item.isDone);
       videoDiv.className = `calendar-content-week-icon ${isDone ? 'done-assignment' : 'video'}`;
       videoDiv.innerText = `${video.filter((item) => item.isDone).length}/${video.length}`;
     } else videoDiv.style.visibility = 'hidden';
+    videoDiv.addEventListener('click', () => modal.openModal(video));
+
+    // -- zoom --
+    const zoom = typeData[ASSIGNMENT_TYPE.ZOOM] || [];
+    const zoomDiv = document.createElement('div');
 
     if (zoom.length > 0) {
       const isDone = zoom.every((item) => item.isDone);
@@ -52,19 +52,20 @@ export default class Calendar {
       zoomDiv.innerText = `${zoom.filter((item) => item.isDone).length}/${zoom.length}`;
     } else zoomDiv.style.visibility = 'hidden';
 
+    zoomDiv.addEventListener('click', () => modal.openModal(zoom));
+
+    // -- quiz --
+    const quiz = typeData[ASSIGNMENT_TYPE.QUIZ] || [];
+    const quizDiv = document.createElement('div');
+
     if (quiz.length > 0) {
       const isDone = quiz.every((item) => item.isDone);
       quizDiv.className = `calendar-content-week-icon ${isDone ? 'done-assignment' : 'quiz'}`;
       quizDiv.innerText = `${quiz.filter((item) => item.isDone).length}/${quiz.length}`;
     } else quizDiv.style.visibility = 'hidden';
 
-    const modal = new Modal();
-    homeWorkDiv.addEventListener('click', () => modal.openModal(homeWork));
-    videoDiv.addEventListener('click', () => modal.openModal(video));
-    zoomDiv.addEventListener('click', () => modal.openModal(zoom));
     quizDiv.addEventListener('click', () => modal.openModal(quiz));
 
-    divCell.appendChild(homeWorkDiv);
     divCell.appendChild(videoDiv);
     divCell.appendChild(zoomDiv);
     divCell.appendChild(quizDiv);

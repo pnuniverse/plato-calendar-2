@@ -1,3 +1,4 @@
+import HomeWork from './domain/homeWork/HomeWork';
 import getHomeworkInfo from './domain/homeWork/HomeWork';
 import getQuizInfo from './domain/quiz/Quiz';
 import getVideoInfo from './domain/video/Video';
@@ -25,9 +26,10 @@ export default async function getInfo() {
     courseIdList.push(courseLinkList[i].href.split('?id=')[1]);
     courseNameList.push(courseNameNodes[i].textContent.split('(')[0].trim());
   }
+  const homework = new HomeWork();
 
   const result = await Promise.all([
-    getHomeworkInfo(courseIdList),
+    (homework.getHomework = Info(courseIdList)),
     getQuizInfo(courseIdList),
     getVideoInfo(courseIdList),
     getZoomInfo(courseIdList),
