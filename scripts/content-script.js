@@ -1,5 +1,6 @@
-import { getInfo, ASSIGNMENT_TYPE } from './getInfo';
+import getInfo from './getInfo';
 import Loading from './loading';
+import ASSIGNMENT_TYPE from './type/assignment.type';
 
 const selectedDate = new Date();
 let assignmentData = [];
@@ -8,7 +9,6 @@ let assignmentData = [];
  * data row 모달창에 생성하는 함수
  */
 function createModalContent(assignment) {
-  // console.log('assign : ', assignment);
   const link = document.createElement('a');
   const img = document.createElement('img');
   const contentDiv = document.createElement('div');
@@ -199,11 +199,6 @@ async function reRenderCalendar() {
     return { ...data, dueDate: new Date(data.dueDate) };
   });
 
-  // await chrome.storage.local.set({
-  //   asyncTimeJSON: new Date().toJSON(),
-  //   info: JSON.stringify(assignmentData),
-  // });
-
   await loadCalendarDate({
     year: selectedDate.getFullYear(),
     month: selectedDate.getMonth() + 1,
@@ -287,10 +282,6 @@ async function createCalendar() {
 
 async function initCalendar() {
   await createCalendar();
-
-  // initPopup();
-  // eventListener 등록
-  // updateCalendar(); //
 }
 
 /**
@@ -341,16 +332,3 @@ window.onload = async () => {
     Loading.hide();
   });
 };
-
-// const initPopup = () => {};
-
-// const updateCalendar = () => {
-//   const data = dataLoad();
-//   //html안에 넣어야 할것 (event역할)
-// };
-
-// const dataLoad = () => {
-//   return [Assignment, Assignment, Assignment, Assignment, Assignment];
-// };
-
-// //style 적용 잘해두기
