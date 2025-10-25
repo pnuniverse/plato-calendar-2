@@ -1,4 +1,5 @@
 import HomeWork from '../../domain/homeWork/HomeWork';
+import Quiz from '../../domain/quiz/Quiz';
 import getInfo from '../../getInfo';
 import Loading from '../../loading';
 import ASSIGNMENT_TYPE from '../type/assignment.type';
@@ -27,6 +28,7 @@ export default class Calendar {
     const modal = new Modal();
 
     const homeWork = new HomeWork();
+    const quiz = new Quiz();
 
     // -- homework --
     homeWork.openHomeworkModal(typeData, modal, divCell);
@@ -55,20 +57,11 @@ export default class Calendar {
     zoomDiv.addEventListener('click', () => modal.openModal(zoom));
 
     // -- quiz --
-    const quiz = typeData[ASSIGNMENT_TYPE.QUIZ] || [];
-    const quizDiv = document.createElement('div');
-
-    if (quiz.length > 0) {
-      const isDone = quiz.every((item) => item.isDone);
-      quizDiv.className = `calendar-content-week-icon ${isDone ? 'done-assignment' : 'quiz'}`;
-      quizDiv.innerText = `${quiz.filter((item) => item.isDone).length}/${quiz.length}`;
-    } else quizDiv.style.visibility = 'hidden';
-
-    quizDiv.addEventListener('click', () => modal.openModal(quiz));
+    quiz.openQuizModal(typeData, modal, divCell);
 
     divCell.appendChild(videoDiv);
     divCell.appendChild(zoomDiv);
-    divCell.appendChild(quizDiv);
+
     spanCell.innerText = date;
 
     cell.appendChild(spanCell);
