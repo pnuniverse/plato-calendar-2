@@ -1,8 +1,8 @@
 import Assignment from './domain/assignment/Assignment';
-import getHomeworkInfo from './domain/homeWork/homeWork';
-import getQuizInfo from './domain/quiz/quiz';
-import getVideoInfo from './domain/video/video';
-import getZoomInfo from './domain/zoom/zoom';
+import getHomeworkInfo from './domain/homeWork/HomeWorks';
+import getQuizInfo from './domain/quiz/Quizs';
+import getVideoInfo from './domain/video/Videos';
+import getZoomInfo from './domain/zoom/Zooms';
 
 /**
  * 모든 과제(homework, quiz, video, zoom) 정보를 가져온다.
