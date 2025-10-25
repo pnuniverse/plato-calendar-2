@@ -1,8 +1,7 @@
 import HomeWork from './domain/homeWork/HomeWork';
-import getHomeworkInfo from './domain/homeWork/HomeWork';
-import getQuizInfo from './domain/quiz/Quiz';
-import getVideoInfo from './domain/video/Video';
-import getZoomInfo from './domain/zoom/Zoom';
+import Quiz from './domain/quiz/Quiz';
+import Video from './domain/video/Video';
+import Zoom from './domain/zoom/Zoom';
 
 /**
  * 모든 과제(homework, quiz, video, zoom) 정보를 가져온다.
@@ -27,12 +26,15 @@ export default async function getInfo() {
     courseNameList.push(courseNameNodes[i].textContent.split('(')[0].trim());
   }
   const homework = new HomeWork();
+  const quiz = new Quiz();
+  const video = new Video();
+  const zoom = new Zoom();
 
   const result = await Promise.all([
-    (homework.getHomework = Info(courseIdList)),
-    getQuizInfo(courseIdList),
-    getVideoInfo(courseIdList),
-    getZoomInfo(courseIdList),
+    homework.getHomeworkInfo(courseIdList),
+    quiz.getQuizInfo(courseIdList),
+    video.getVideoInfo(courseIdList),
+    zoom.getZoomInfo(courseIdList),
   ]);
   const assignments = result.flat();
 

@@ -26,6 +26,7 @@ export default class Calendar {
       );
     });
     const typeData = Object.groupBy(dateData, ({ type }) => type);
+
     const modal = new Modal();
 
     const homeWork = new HomeWork();
