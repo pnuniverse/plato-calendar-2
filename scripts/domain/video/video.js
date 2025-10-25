@@ -1,4 +1,4 @@
-import ASSIGNMENT_TYPE from '../../type/assignment.type';
+import ASSIGNMENT_TYPE from '../../common/type/assignment.type';
 import Assignment from '../assignment/Assignment';
 
 /**

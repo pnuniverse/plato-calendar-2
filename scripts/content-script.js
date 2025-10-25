@@ -1,6 +1,6 @@
 import getInfo from './getInfo';
 import Loading from './loading';
-import ASSIGNMENT_TYPE from './type/assignment.type';
+import ASSIGNMENT_TYPE from './common/type/assignment.type';
 
 const selectedDate = new Date();
 let assignmentData = [];
