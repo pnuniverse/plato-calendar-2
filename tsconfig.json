@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "esnext",
+    "moduleResolution": "bundler",
+
+    "allowJs": true,
+    "checkJs": false,
+
+    "strict": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+
+    "esModuleInterop": true,
+    "isolatedModules": true,
+
+    "types": ["chrome"],
+
+    "sourceMap": true,
+
+    "rootDir": "./scripts",
+    "outDir": "./dist"
+  },
+
+  "include": ["scripts/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
