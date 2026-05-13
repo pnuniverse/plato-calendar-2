@@ -7,7 +7,7 @@ export const ASSIGNMENT_TYPE = {
 
 export type AssignmentType = (typeof ASSIGNMENT_TYPE)[keyof typeof ASSIGNMENT_TYPE];
 
-class Assignment {
+export class Assignment {
   constructor(
     public title: string,
     public link: string | null,
