@@ -1,34 +1,22 @@
-/**
- * @enum {{ HOMEWORK: string, QUIZ: string, VIDEO: string, ZOOM: string }} ASSIGNMENT_TYPE
- */
 export const ASSIGNMENT_TYPE = {
   HOMEWORK: 'homework',
   QUIZ: 'quiz',
   VIDEO: 'video',
   ZOOM: 'zoom',
-};
+} as const;
 
-/**
- * 과제 정보를 담는 클래스
- * @class Assignment
- * @property { string } title - 과제 제목
- * @property { string } link - 과제 링크
- * @property { Date } dueDate - 과제 마감일
- * @property { string } type - 과제 유형 (homework, quiz, video, zoom)
- * @property { boolean } isDone - 과제 완료 여부
- * @property { string } courseId - 강의 id
- * @property { string } courseName - 강의명
- */
+export type AssignmentType = (typeof ASSIGNMENT_TYPE)[keyof typeof ASSIGNMENT_TYPE];
+
 class Assignment {
-  constructor(title, link, dueDate, type, isDone, courseId, courseName) {
-    this.title = title;
-    this.link = link;
-    this.dueDate = dueDate;
-    this.type = type;
-    this.isDone = isDone;
-    this.courseId = courseId;
-    this.courseName = courseName;
-  }
+  constructor(
+    public title: string,
+    public link: string | null,
+    public dueDate: Date | null,
+    public type: AssignmentType,
+    public isDone: boolean,
+    public courseId: string,
+    public courseName?: string,
+  ) {}
 }
 
 /**
@@ -36,11 +24,11 @@ class Assignment {
  * @param { string[] } courseIdList - 과목 id 리스트
  * @returns { Promise<Assignment[]> }
  */
-const getHomeworkInfo = async (courseIdList) => {
-  const promises = courseIdList.map((courseId) => {
-    return new Promise((resolve) => {
+const getHomeworkInfo = async (courseIdList: string[]): Promise<Assignment[]> => {
+  const promises: Array<Promise<Assignment[]>> = courseIdList.map((courseId) => {
+    return new Promise<Assignment[]>((resolve) => {
       (async () => {
-        const result = [];
+        const result: Assignment[] = [];
         const res = await fetch(
           `https://plato.pusan.ac.kr/mod/assign/index.php?id=${courseId}`,
         );
@@ -50,16 +38,14 @@ const getHomeworkInfo = async (courseIdList) => {
         const rows = doc.querySelectorAll('tbody tr');
         for (let i = 0; i < rows.length; i += 1) {
           const title = rows[i].querySelector('td.cell.c1 a')?.innerHTML;
-          const link = rows[i].querySelector('td.cell.c1 a')?.href;
-          const dueDate = new Date(
-            rows[i].querySelector('td.cell.c2')?.innerHTML,
-          );
+          const link = rows[i].querySelector<HTMLAnchorElement>('td.cell.c1 a')?.href;
+          const dueDateText = rows[i].querySelector('td.cell.c2')?.innerHTML;
+          const dueDate = new Date(dueDateText ?? '');
+          const statusText = rows[i].querySelector('td.cell.c3')?.innerHTML;
           const isDone =
-            rows[i].querySelector('td.cell.c3')?.innerHTML === '제출 완료' ||
-            rows[i].querySelector('td.cell.c3')?.innerHTML ===
-              'Submitted for grading';
+            statusText === '제출 완료' || statusText === 'Submitted for grading';
 
-          if (title !== undefined) {
+          if (title !== undefined && link !== undefined) {
             result.push(
               new Assignment(
                 title,
@@ -83,14 +69,12 @@ const getHomeworkInfo = async (courseIdList) => {
 
 /**
  * quiz 정보를 가져온다.
- * @param { string[] } courseIdList - 과목 id 리스트
- * @returns { Promise<Assignment[]> }
  */
-const getQuizInfo = async (courseIdList) => {
+const getQuizInfo = async (courseIdList: string[]): Promise<Assignment[]> => {
   const promises = courseIdList.map((courseId) => {
-    return new Promise((resolve) => {
+    return new Promise<Assignment[]>((resolve) => {
       (async () => {
-        const result = [];
+        const result: Assignment[] = [];
         const res = await fetch(
           `https://plato.pusan.ac.kr/mod/quiz/index.php?id=${courseId}`,
         );
@@ -100,10 +84,11 @@ const getQuizInfo = async (courseIdList) => {
         const rows = doc.querySelectorAll('tbody tr');
         for (let i = 0; i < rows.length; i += 1) {
           const title = rows[i].querySelector('td.cell.c1 a')?.innerHTML;
-          const link = `https://plato.pusan.ac.kr/mod/quiz/${rows[i].querySelector('td.cell.c1 a')?.href.split('pusan.ac.kr/')[1]}`;
-          const dueDate = new Date(
-            rows[i].querySelector('td.cell.c2')?.innerHTML,
-          );
+          const anchor = rows[i].querySelector<HTMLAnchorElement>('td.cell.c1 a');
+          const href = anchor?.href ?? '';
+          const link = `https://plato.pusan.ac.kr/mod/quiz/${href.split('pusan.ac.kr/')[1] ?? ''}`;
+          const dueDateText = rows[i].querySelector('td.cell.c2')?.innerHTML;
+          const dueDate = new Date(dueDateText ?? '');
           const isDone =
             rows[i].querySelector('td.cell.c3')?.textContent !== '' ||
             dueDate <= new Date();
@@ -130,16 +115,21 @@ const getQuizInfo = async (courseIdList) => {
   return result.flat();
 };
 
+
+type VideoExtraInfo = {
+  title: string;
+  link: string;
+  dueDate: Date;
+};
+
 /**
  * video 정보를 가져온다.
- * @param { string[] } courseIdList - 과목 id 리스트
- * @returns { Promise<Assignment[]> }
  */
-const getVideoInfo = async (courseIdList) => {
+const getVideoInfo = async (courseIdList: string[]): Promise<Assignment[]> => {
   const promises = courseIdList.map((courseId) => {
-    return new Promise((resolve) => {
+    return new Promise<Assignment[]>((resolve) => {
       (async () => {
-        const result = [];
+        const result: Assignment[] = [];
         const res = await fetch(
           `https://plato.pusan.ac.kr/report/ubcompletion/user_progress_a.php?id=${courseId}`,
         );
@@ -151,8 +141,6 @@ const getVideoInfo = async (courseIdList) => {
           const title = rows[i]
             .querySelector('td.text-left')
             ?.textContent.trim();
-          const link = null;
-          const dueDate = null;
           const isDone = Array.from(
             rows[i].querySelectorAll('td.text-center'),
           ).some((td) => td.textContent === 'O');
@@ -160,8 +148,8 @@ const getVideoInfo = async (courseIdList) => {
             result.push(
               new Assignment(
                 title,
-                link,
-                dueDate,
+                null,
+                null,
                 ASSIGNMENT_TYPE.VIDEO,
                 isDone,
                 courseId,
@@ -175,8 +163,8 @@ const getVideoInfo = async (courseIdList) => {
   });
 
   const otherInfoPromises = courseIdList.map((courseId) => {
-    const videoAssignmentsPromises = [];
-    return new Promise((resolve) => {
+    const videoAssignmentsPromises: Promise<VideoExtraInfo>[] = [];
+    return new Promise<Promise<VideoExtraInfo>[]>((resolve) => {
       (async () => {
         const res = await fetch(
           `https://plato.pusan.ac.kr/mod/vod/index.php?id=${courseId}`,
@@ -186,20 +174,19 @@ const getVideoInfo = async (courseIdList) => {
         const doc = parser.parseFromString(text, 'text/html');
         const rows = doc.querySelectorAll('tbody tr');
         for (let i = 0; i < rows.length; i += 1) {
-          const title = rows[i].querySelector('.cell.c1 a')?.textContent.trim();
-          const videoId = rows[i]
-            .querySelector('.cell.c1 a')
-            ?.href.split('id=')[1];
-          if (videoId !== undefined) {
+          const title = rows[i].querySelector('.cell.c1 a')?.textContent?.trim();
+          const videoId = rows[i].querySelector<HTMLAnchorElement>('.cell.c1 a')?.href.split('id=')[1];
+          
+          if (videoId !== undefined && title !== undefined) {
             const link = `https://plato.pusan.ac.kr/mod/vod/view.php?id=${videoId}`;
             videoAssignmentsPromises.push(
-              new Promise((resolve2) => {
+              new Promise<VideoExtraInfo>((resolve2) => {
                 fetch(link)
                   .then((response) => response.text())
                   .then((resp) => {
                     const d = parser.parseFromString(resp, 'text/html');
                     const date =
-                      d.querySelectorAll('.vod_info_value')[1]?.textContent;
+                      d.querySelectorAll('.vod_info_value')[1]?.textContent ?? '';
 
                     resolve2({
                       title,
@@ -222,18 +209,23 @@ const getVideoInfo = async (courseIdList) => {
     await Promise.all((await Promise.all(otherInfoPromises)).flat())
   ).flat();
 
-  const result = [];
+  const result: Assignment[] = [];
 
   videoAssignmentWithOtherInfo.forEach((item) => {
     const index = assignments.findIndex(
       (assignment) => assignment.title === item.title,
     );
     if (index !== -1) {
-      result.push({
-        ...assignments[index],
-        link: item.link,
-        dueDate: item.dueDate,
-      });
+      result.push(
+        new Assignment(
+          assignments[index].title,
+          item.link,
+          item.dueDate,
+          assignments[index].type,
+          assignments[index].isDone,
+          assignments[index].courseId,
+        ),
+      );
       assignments.splice(index, 1);
     }
   });
@@ -243,12 +235,10 @@ const getVideoInfo = async (courseIdList) => {
 
 /**
  * zoom 정보를 가져온다.
- * @param { string[] } courseIdList - 과목 id 리스트
- * @returns { Promise<Assignment[]> }
  */
-const getZoomInfo = async (courseIdList) => {
+const getZoomInfo = async (courseIdList: string[]): Promise<Assignment[]> => {
   const promises = courseIdList.map((courseId) => {
-    return new Promise((resolve) => {
+    return new Promise<Assignment[]>((resolve) => {
       (async () => {
         const result = [];
         const res = await fetch(
@@ -262,10 +252,9 @@ const getZoomInfo = async (courseIdList) => {
           const title = rows[i]
             .querySelector('td.cell.c1 a')
             ?.textContent.trim();
-          const link = `https://plato.pusan.ac.kr/mod/zoom/${rows[i].querySelector('td.cell.c1 a')?.href.split('pusan.ac.kr/')[1]}`;
-          const dueDate = new Date(
-            rows[i].querySelector('td.cell.c2')?.textContent,
-          );
+          const link = `https://plato.pusan.ac.kr/mod/zoom/${rows[i].querySelector<HTMLAnchorElement>('td.cell.c1 a')?.href.split('pusan.ac.kr/')[1]}`;
+          const dueDateText = rows[i].querySelector('td.cell.c2')?.textContent ?? '';
+          const dueDate = new Date(dueDateText);
           const isDone = dueDate <= new Date();
 
           if (title !== undefined) {
@@ -294,23 +283,25 @@ const getZoomInfo = async (courseIdList) => {
  * 모든 과제(homework, quiz, video, zoom) 정보를 가져온다.
  * @returns { Promise<Assignment[]> }
  */
-export const getInfo = async () => {
+export const getInfo = async (): Promise<Assignment[]> => {
   const res = await fetch('https://plato.pusan.ac.kr');
   const text = await res.text();
   const parser = new DOMParser();
   const doc = parser.parseFromString(text, 'text/html');
-  const courseLinkList = doc.querySelectorAll(
+  const courseLinkList = doc.querySelectorAll<HTMLAnchorElement>(
     '.my-course-lists > li > .course-box > a',
   );
   const courseNameNodes = doc.querySelectorAll(
     '.my-course-lists > li > .course-box > a .course-title h3',
   );
 
-  const courseIdList = [];
-  const courseNameList = [];
+  const courseIdList: string[] = [];
+  const courseNameList: string[] = [];
   for (let i = 0; i < courseLinkList.length; i += 1) {
-    courseIdList.push(courseLinkList[i].href.split('?id=')[1]);
-    courseNameList.push(courseNameNodes[i].textContent.split('(')[0].trim());
+    const id = courseLinkList[i].href.split('?id=')[1];
+    const name = courseNameNodes[i].textContent?.split('(')[0].trim() ?? '';
+    courseIdList.push(id);
+    courseNameList.push(name);
   }
 
   const result = await Promise.all([
@@ -321,8 +312,9 @@ export const getInfo = async () => {
   ]);
   const assignments = result.flat();
 
-  assignments.map((assignment) => {
+  assignments.forEach((assignment) => {
     if (
+      assignment.dueDate !== null &&
       assignment.dueDate.getHours() === 0 &&
       assignment.dueDate.getMinutes() === 0
     ) {
@@ -330,7 +322,6 @@ export const getInfo = async () => {
       assignment.dueDate.setHours(23);
       assignment.dueDate.setMinutes(59);
     }
-    return assignment;
   });
 
   return assignments.map((assignment) => {
