@@ -246,11 +246,11 @@ async function reRenderCalendar() {
 /**
  * 캘린더 생성
  */
-async function createCalendar(): Promise<void> {
+async function createCalendar(): Promise<HTMLElement> {
   const domparser = new DOMParser();
   const calendarURL = chrome.runtime.getURL('/assets/calendar.html');
 
-  return new Promise<void>((resolve, reject) => {
+  return new Promise<HTMLElement>((resolve, reject) => {
     fetch(calendarURL)
       .then(async (data) => {
         const leftImg = chrome.runtime.getURL('/assets/img/left.png');
@@ -315,13 +315,7 @@ async function createCalendar(): Promise<void> {
         toggle.appendChild(calendar);
         toggle.id = 'plato_calendar-container';
 
-        const root = document.querySelector('.front-box');
-        if (root === null) {
-          reject(new Error('.front-box not found'));
-          return;
-        }
-        root.insertBefore(toggle, root.firstChild);
-        resolve();
+        resolve(toggle);
       })
       .catch((error) => {
         console.log('error: ', error);
@@ -330,8 +324,10 @@ async function createCalendar(): Promise<void> {
   });
 }
 
-async function initCalendar() {
-  await createCalendar();
+async function initCalendar(targetContainer: HTMLElement) {
+  const calendar: HTMLElement = await createCalendar();
+  if (!targetContainer) return;
+  targetContainer.insertBefore(calendar, targetContainer.firstChild);
 }
 
 /**
@@ -379,11 +375,12 @@ async function loadCalendarData() {
 }
 
 window.onload = async () => {
-  if (!document.getElementsByClassName('front-box front-box-pmooc').length)
+  const targetContainer: HTMLElement | null = document.querySelector('#page-content .ongoing-courses');
+  if (targetContainer === null)
     return;
-  await initCalendar();
+  await initCalendar(targetContainer);
   Loading.show();
-  loadCalendarData().then(() => {
+  await loadCalendarData().then(() => {
     loadCalendarDate({
       year: selectedDate.getFullYear(),
       month: selectedDate.getMonth() + 1,
