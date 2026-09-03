@@ -93,8 +93,39 @@ a:visited {
   justify-content: space-between;
 }
 
+/* 범례 아이콘은 눌러서 그 달의 해당 유형만 모아볼 수 있다. */
 .calendar-header-info-icons > div {
+  position: relative;
   align-items: end;
+  padding: 2px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* 아이콘 위에 그 달의 활동 개수를 얹는다. 없는 유형은 :empty로 감춰진다. */
+.plato-calendar-2-legend-count {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  box-sizing: border-box;
+  min-width: 15px;
+  height: 15px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background-color: var(--pnuColor);
+  color: white;
+  font-size: 10px;
+  font-weight: bold;
+  line-height: 15px;
+  text-align: center;
+}
+
+.plato-calendar-2-legend-count:empty {
+  display: none;
+}
+
+.calendar-header-info-icons > div:hover {
+  background-color: var(--csms-bg-hierarchy-tertiary, #e0e3e5);
 }
 
 .calendar-header-info-icons label {
@@ -113,7 +144,7 @@ a:visited {
 .calendar-header-info-icons {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: 8px;
   align-items: center;
 }
 
@@ -304,6 +335,14 @@ a:visited {
 
 .plato-calendar-2-modal-list::-webkit-scrollbar {
   display: none;
+}
+
+.plato-calendar-2-modal-empty {
+  padding: 24px 10px;
+  color: var(--csms-tx-hierarchy-tertiary, #575e64);
+  font-size: 14px;
+  line-height: 21px;
+  text-align: center;
 }
 
 /* 사이드 nav의 학교 서비스 하위 항목(.csms-service-menu)과 같은 결의 행 카드 */

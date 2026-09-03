@@ -1,4 +1,9 @@
-import { getInfo, ASSIGNMENT_TYPE, Assignment } from './getInfo';
+import {
+  getInfo,
+  ASSIGNMENT_TYPE,
+  Assignment,
+  AssignmentType,
+} from './getInfo';
 import Loading from './loading';
 
 const selectedDate = new Date();
@@ -60,10 +65,6 @@ function formatDueDate(dueDate: Date): string {
  * @param { Assignment } assignment - 과제 정보
  */
 function createModalContent(assignment: Assignment): DocumentFragment {
-  if (assignment.dueDate === null) {
-    throw new Error('createModalContent: dueDate is required');
-  }
-
   const card = cloneTemplate('plato-calendar-2-modal-card');
   const link = card.querySelector<HTMLAnchorElement>(
     '.plato-calendar-2-service-menu',
@@ -93,7 +94,9 @@ function createModalContent(assignment: Assignment): DocumentFragment {
   title.textContent = assignment.title;
   desc.textContent = [
     assignment.courseName,
-    `마감 ${formatDueDate(assignment.dueDate)}`,
+    assignment.dueDate === null
+      ? '마감일 없음'
+      : `마감 ${formatDueDate(assignment.dueDate)}`,
   ]
     .filter(Boolean)
     .join(' · ');
@@ -102,46 +105,42 @@ function createModalContent(assignment: Assignment): DocumentFragment {
 }
 
 /**
- * 모달 헤더 문구. 한 칸의 한 유형만 넘어오므로 첫 항목을 기준으로 만든다.
- * @param { Assignment[] } data - 과제 정보
- */
-function createModalTitle(data: Assignment[]): string {
-  const [first] = data;
-  if (first === undefined) return '';
-
-  const { dueDate } = first;
-  if (dueDate === null) return first.type;
-
-  return `${dueDate.getMonth() + 1}월 ${dueDate.getDate()}일 ${first.type}`;
-}
-
-/**
  * 모달 열기
- * @param { Assignment[] } data - 과제 정보
+ * @param { string } title - 모달 헤더 문구
+ * @param { Assignment[] } data - 띄울 과제 정보
  */
-function openModal(data: Assignment[]): void {
+function openModal(title: string, data: Assignment[]): void {
   const modal = document.querySelector<HTMLElement>('#plato-calendar-2-modal');
-  const title = document.querySelector<HTMLElement>(
+  const modalTitle = document.querySelector<HTMLElement>(
     '.plato-calendar-2-modal-title',
   );
   const list = document.querySelector<HTMLElement>(
     '.plato-calendar-2-modal-list',
   );
 
-  if (modal === null || title === null || list === null) return;
+  if (modal === null || modalTitle === null || list === null) return;
 
-  const DoneData = data.filter((item) => item.isDone);
-  const NotDoneData = data.filter((item) => !item.isDone);
+  // 마감이 이른 순으로 두되 이미 한 것은 뒤로 보낸다.
+  const sorted = [...data].sort((a, b) => {
+    if (a.isDone !== b.isDone) return a.isDone ? 1 : -1;
+    // 마감일이 없는 활동은 순서를 매길 수 없으므로 뒤로 보낸다.
+    if ((a.dueDate === null) !== (b.dueDate === null)) {
+      return a.dueDate === null ? 1 : -1;
+    }
 
-  title.textContent = createModalTitle(data);
+    return (a.dueDate?.getTime() ?? 0) - (b.dueDate?.getTime() ?? 0);
+  });
+
+  modalTitle.textContent = title;
 
   list.innerHTML = '';
-  NotDoneData.forEach((assignment) => {
-    list.appendChild(createModalContent(assignment));
-  });
-  DoneData.forEach((assignment) => {
-    list.appendChild(createModalContent(assignment));
-  });
+  if (sorted.length === 0) {
+    list.appendChild(cloneTemplate('plato-calendar-2-modal-empty'));
+  } else {
+    sorted.forEach((assignment) => {
+      list.appendChild(createModalContent(assignment));
+    });
+  }
 
   modal.style.display = 'flex';
 }
@@ -198,7 +197,9 @@ function renderCell(cell: HTMLElement, date: number): void {
     iconImg.alt = type;
     countSpan.textContent = `${doneCount}/${items.length}`;
 
-    icon.addEventListener('click', () => openModal(items));
+    icon.addEventListener('click', () =>
+      openModal(`${selectedDate.getMonth() + 1}월 ${date}일 ${type}`, items),
+    );
     icons.appendChild(icon);
   });
 
@@ -240,8 +241,10 @@ async function loadCalendarDate({
 
   const disMonth = document.querySelector<HTMLElement>('#thisMonth');
   if (disMonth !== null) {
-    disMonth.innerText = `${year}년 ${month}월`;
+    disMonth.textContent = `${year}년 ${month}월`;
   }
+
+  updateTypeLegendCounts();
 }
 
 /**
@@ -258,6 +261,58 @@ async function syncCalendar(): Promise<void> {
   });
 
   Loading.hide();
+}
+
+/**
+ * 범례에서 다루는 활동. 개수 배지와 모달이 같은 기준을 쓰도록 여기로 모은다.
+ * 마감일이 없는 활동은 특정 달에 속하지 않으므로 유형만 맞으면 함께 본다.
+ * @param { AssignmentType } type - 학습활동 유형
+ */
+function getTypeAssignments(type: AssignmentType): Assignment[] {
+  const year = selectedDate.getFullYear();
+  const month = selectedDate.getMonth();
+
+  return assignmentData.filter(
+    (assignment) =>
+      assignment.type === type &&
+      (assignment.dueDate === null ||
+        (assignment.dueDate.getMonth() === month &&
+          assignment.dueDate.getFullYear() === year)),
+  );
+}
+
+/**
+ * 범례 아이콘을 눌렀을 때. 보고 있는 달의 해당 유형 과제를 모두 띄운다.
+ * @param { AssignmentType } type - 학습활동 유형
+ */
+function openTypeModal(type: AssignmentType): void {
+  const year = selectedDate.getFullYear();
+  const month = selectedDate.getMonth();
+
+  openModal(`${year}년 ${month + 1}월 ${type}`, getTypeAssignments(type));
+}
+
+/**
+ * 범례 아이콘의 미완료 개수 배지를 다시 계산한다.
+ * 과제 정보나 보고 있는 달이 바뀌면 호출한다.
+ */
+function updateTypeLegendCounts(): void {
+  document
+    .querySelectorAll<HTMLElement>('.calendar-header-info-icons > div')
+    .forEach((box) => {
+      const badge = box.querySelector<HTMLElement>(
+        '.plato-calendar-2-legend-count',
+      );
+      const { type } = box.dataset;
+
+      if (badge === null || type === undefined) return;
+
+      const remaining = getTypeAssignments(type).filter(
+        (assignment) => !assignment.isDone,
+      ).length;
+      // 남은 활동이 없으면 배지를 비워 감춘다.
+      badge.textContent = remaining === 0 ? '' : String(remaining);
+    });
 }
 
 /**
@@ -279,6 +334,8 @@ function renderTypeLegend(calendar: Element): void {
     img.src = chrome.runtime.getURL(`/assets/img-v2/${type}.svg`);
     img.alt = type;
     box.title = type;
+    box.dataset.type = type;
+    box.addEventListener('click', () => openTypeModal(type));
     legend.appendChild(item);
   });
 }
