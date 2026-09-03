@@ -4,14 +4,11 @@
   --backgroundColor: #fafafa;
   --borderColor: #d3d3d3;
   --textColor: #616161;
-  --video: #b0de85;
-  --homework: #e6675c;
-  --quiz: #c065a9;
-  --zoom: #3891ff;
 }
 
 summary {
   width: 100%;
+  box-sizing: border-box;
   padding: 10px 20px;
   border-radius: 5px;
   font-size: medium;
@@ -27,11 +24,11 @@ a:visited {
 #plato_calendar-container {
   display: flex;
   width: 100%;
+  box-sizing: border-box;
   margin-bottom: 10px;
   border-radius: 5px;
   justify-content: start;
-  align-items: center;
-  padding-left: 10px;
+  align-items: stretch;
   flex-direction: column;
   font-family: 'Noto Sans KR', sans-serif;
 }
@@ -50,16 +47,13 @@ a:visited {
   cursor: pointer;
 }
 
-#re-rendering:hover {
-  cursor: pointer;
-}
-
 /* calendar */
 .calendar {
   position: relative;
   height: fit-content;
   color: black;
   width: 100%;
+  box-sizing: border-box;
 }
 
 /* calendar-header */
@@ -67,7 +61,8 @@ a:visited {
   display: flex;
   justify-content: space-between;
   align-items: end;
-  margin: 10px;
+  gap: 10px;
+  margin: 10px 0;
   height: fit-content;
 }
 .calendar-header div {
@@ -90,19 +85,6 @@ a:visited {
   justify-content: space-between;
 }
 
-.calendar-header-info > div:last-child {
-  border-radius: 5px;
-  padding: 10px;
-  margin-left: 32px;
-  background-color: var(--pnuColor);
-  color: white;
-  font-weight: bold;
-}
-
-.calendar-header-info > div:last-child img {
-  padding-right: 10px;
-}
-
 .calendar-header-info-icons > div {
   align-items: end;
 }
@@ -120,10 +102,16 @@ a:visited {
   visibility: hidden;
 }
 
+.calendar-header-info-icons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+}
+
 .calendar-header-info-icons img {
-  width: 30px;
-  height: 30px;
-  margin-right: 5px;
+  width: 20px;
+  height: 20px;
 }
 
 /* calendar-content */
@@ -137,6 +125,8 @@ a:visited {
 }
 
 .calendar-content ul {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
   list-style: none;
   padding: 0;
   margin: 0;
@@ -144,9 +134,9 @@ a:visited {
 }
 
 .calendar-content li {
-  display: block;
-  float: left;
-  width: 14.285%;
+  /* 칸 안의 내용이 넘쳐도 칸 너비를 밀어내지 않도록 한다. */
+  min-width: 0;
+  overflow: hidden;
   padding: 5px;
   box-sizing: border-box;
   border: 1px solid #ccc;
@@ -171,6 +161,7 @@ a:visited {
   display: flex;
   justify-content: space-between;
   align-content: end;
+  gap: 4px;
   height: 96px;
 }
 
@@ -183,9 +174,10 @@ a:visited {
 }
 
 .calendar-content-week li > div {
-  display: grid;
-  grid-template-rows: 40px 40px;
-  grid-template-columns: 40px 40px;
+  display: flex;
+  flex-wrap: wrap;
+  min-width: 0;
+  gap: 2px 4px;
   align-items: center;
   justify-content: center;
 }
@@ -198,35 +190,28 @@ a:visited {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  color: white;
+  gap: 2px;
+  color: var(--textColor);
+  font-size: 11px;
   font-weight: bold;
 }
 
-.homeWork {
-  background-color: var(--homework);
+.calendar-content-week-icon > img {
+  width: 16px;
+  height: 16px;
 }
 
-.video {
-  background-color: var(--video);
-}
-
-.quiz {
-  background-color: var(--quiz);
-}
-
-.zoom {
-  background-color: var(--zoom);
-}
-
+/* 완료된 활동은 아이콘 고유 색을 죽인다. */
 .done-assignment {
-  background-color: var(--textColor);
+  opacity: 0.45;
+}
+
+.done-assignment > img {
+  filter: grayscale(1);
 }
 
 /* Modal */
-#calendarModal {
+#plato-calendar-2-modal {
   display: none;
   flex-direction: column;
   justify-content: center;
@@ -240,7 +225,7 @@ a:visited {
   z-index: 5;
 }
 
-.modal-content {
+.plato-calendar-2-modal-content {
   display: flex;
   flex-direction: column;
   justify-content: start;
@@ -254,11 +239,11 @@ a:visited {
   background-color: var(--backgroundColor) !important;
 }
 
-.modal-content::-webkit-scrollbar {
+.plato-calendar-2-modal-content::-webkit-scrollbar {
   display: none;
 }
 
-.modal-content > span {
+.plato-calendar-2-modal-content > span {
   display: flex;
   justify-content: end;
   width: 90%;
@@ -267,11 +252,11 @@ a:visited {
   font-size: 20px;
 }
 
-.modal-content-header {
+.plato-calendar-2-modal-content-header {
   cursor: pointer;
 }
 
-.modal-content-card {
+.plato-calendar-2-modal-content-card {
   display: flex;
   align-items: center;
   width: 80%;
@@ -282,39 +267,44 @@ a:visited {
   text-decoration: none;
 }
 
-.modal-content-card:hover {
+.plato-calendar-2-modal-content-card:hover {
   background: var(--borderColor);
   transition: ease-in-out 0.5s;
 }
 
-.modal-content-card > img {
+.plato-calendar-2-modal-content-card > img {
   width: 36px;
   height: 36px;
   margin-right: 10px;
 }
 
-.modal-content-card > div {
+.plato-calendar-2-modal-content-card > div {
   display: grid;
   grid-template-rows: 1fr 1fr;
   grid-template-columns: 1fr 1fr;
   width: 100%;
 }
 
-.modal-content-card > div > div {
+.plato-calendar-2-modal-content-card > div > div {
   color: var(--textColor) !important;
 }
 
-.modal-content-card > div > div:first-child {
+.plato-calendar-2-modal-content-card > div > div:first-child {
   grid-column: 1 / span 2;
   color: black !important;
   font-weight: bold !important;
 }
 
-.modal-content-card > div > div:nth-child(2) {
+.plato-calendar-2-modal-content-card > div > div:nth-child(2) {
   width: 90%;
   text-wrap: nowrap;
 }
 
-.done-modal-card {
+.plato-calendar-2-done-modal-card {
   background-color: var(--borderColor) !important;
+}
+
+.plato-calendar-2-done-modal-card > img {
+  filter: grayscale(1);
+  opacity: 0.45;
 }

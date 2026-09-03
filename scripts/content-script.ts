@@ -17,12 +17,12 @@ function createModalContent(assignment: Assignment) {
   const img = document.createElement('img');
   const contentDiv = document.createElement('div');
 
-  let typeImg = chrome.runtime.getURL(`/assets/img/${assignment.type}.png`);
-  if (assignment.isDone)
-    typeImg = chrome.runtime.getURL(`/assets/img/${assignment.type}Done.png`);
+  const typeImg = chrome.runtime.getURL(
+    `/assets/img-v2/${assignment.type}.svg`,
+  );
 
-  link.className = 'modal-content-card';
-  if (assignment.isDone) link.classList.add('done-modal-card');
+  link.className = 'plato-calendar-2-modal-content-card';
+  if (assignment.isDone) link.classList.add('plato-calendar-2-done-modal-card');
 
   link.href = assignment.link ?? '#';
   link.target = '_blank';
@@ -45,8 +45,8 @@ function createModalContent(assignment: Assignment) {
  * @param { Assignment[] } data - 과제 정보
  */
 function openModal(data: Assignment[]): void {
-  const modal = document.querySelector<HTMLElement>('#calendarModal');
-  const modalContent = document.querySelector<HTMLElement>('.modal-content');
+  const modal = document.querySelector<HTMLElement>('#plato-calendar-2-modal');
+  const modalContent = document.querySelector<HTMLElement>('.plato-calendar-2-modal-content');
 
   if (modal === null || modalContent === null) return;
 
@@ -55,7 +55,7 @@ function openModal(data: Assignment[]): void {
   const NotDoneData = data.filter((item) => !item.isDone);
 
   modalContent.innerHTML = '';
-  closeBtn.className = 'modal-content-header';
+  closeBtn.className = 'plato-calendar-2-modal-content-header';
   closeBtn.innerText = 'x';
   closeBtn.addEventListener('click', () => {
     modal.style.display = 'none';
@@ -100,49 +100,30 @@ function renderCell(cell: HTMLElement, date: number): void {
   });
   const typeData = Object.groupBy(dateData, ({ type }) => type);
 
-  const homeWork = typeData[ASSIGNMENT_TYPE.HOMEWORK] ?? [];
-  const video = typeData[ASSIGNMENT_TYPE.VIDEO] ?? [];
-  const zoom = typeData[ASSIGNMENT_TYPE.ZOOM] ?? [];
-  const quiz = typeData[ASSIGNMENT_TYPE.QUIZ] ?? [];
+  // 그 날 존재하는 유형만 아이콘으로 그린다.
+  Object.values(ASSIGNMENT_TYPE).forEach((type) => {
+    const items = typeData[type] ?? [];
+    if (items.length === 0) return;
 
-  const homeWorkDiv = document.createElement('div');
-  const videoDiv = document.createElement('div');
-  const zoomDiv = document.createElement('div');
-  const quizDiv = document.createElement('div');
+    const doneCount = items.filter((item) => item.isDone).length;
+    const iconDiv = document.createElement('div');
+    const iconImg = document.createElement('img');
+    const countSpan = document.createElement('span');
 
-  if (homeWork.length > 0) {
-    const isDone = homeWork.every((item) => item.isDone);
-    homeWorkDiv.className = `calendar-content-week-icon ${isDone ? 'done-assignment' : 'homeWork'}`;
-    homeWorkDiv.innerText = `${homeWork.filter((item) => item.isDone).length}/${homeWork.length}`;
-  } else homeWorkDiv.style.visibility = 'hidden';
+    iconDiv.className = 'calendar-content-week-icon';
+    if (doneCount === items.length) iconDiv.classList.add('done-assignment');
+    iconDiv.title = type;
 
-  if (video.length > 0) {
-    const isDone = video.every((item) => item.isDone);
-    videoDiv.className = `calendar-content-week-icon ${isDone ? 'done-assignment' : 'video'}`;
-    videoDiv.innerText = `${video.filter((item) => item.isDone).length}/${video.length}`;
-  } else videoDiv.style.visibility = 'hidden';
+    iconImg.src = chrome.runtime.getURL(`/assets/img-v2/${type}.svg`);
+    iconImg.alt = type;
+    countSpan.innerText = `${doneCount}/${items.length}`;
 
-  if (zoom.length > 0) {
-    const isDone = zoom.every((item) => item.isDone);
-    zoomDiv.className = `calendar-content-week-icon ${isDone ? 'done-assignment' : 'zoom'}`;
-    zoomDiv.innerText = `${zoom.filter((item) => item.isDone).length}/${zoom.length}`;
-  } else zoomDiv.style.visibility = 'hidden';
+    iconDiv.appendChild(iconImg);
+    iconDiv.appendChild(countSpan);
+    iconDiv.addEventListener('click', () => openModal(items));
+    divCell.appendChild(iconDiv);
+  });
 
-  if (quiz.length > 0) {
-    const isDone = quiz.every((item) => item.isDone);
-    quizDiv.className = `calendar-content-week-icon ${isDone ? 'done-assignment' : 'quiz'}`;
-    quizDiv.innerText = `${quiz.filter((item) => item.isDone).length}/${quiz.length}`;
-  } else quizDiv.style.visibility = 'hidden';
-
-  homeWorkDiv.addEventListener('click', () => openModal(homeWork));
-  videoDiv.addEventListener('click', () => openModal(video));
-  zoomDiv.addEventListener('click', () => openModal(zoom));
-  quizDiv.addEventListener('click', () => openModal(quiz));
-
-  divCell.appendChild(homeWorkDiv);
-  divCell.appendChild(videoDiv);
-  divCell.appendChild(zoomDiv);
-  divCell.appendChild(quizDiv);
   spanCell.innerText = String(date);
 
   cell.appendChild(spanCell);
@@ -187,60 +168,41 @@ async function loadCalendarDate({
   }
 }
 
-function setRenderBtn(time: number = 60): void {
-  const renderBtnText = document.querySelector<HTMLElement>('#re-rendering > div');
-  if (renderBtnText === null) return;
-
-  let clock = Math.ceil(time);
-  const timer = setInterval(() => {
-    clock -= 1;
-    renderBtnText.innerText = `동기화 (${clock})`;
-    if (clock <= 0) {
-      clearInterval(timer);
-      renderBtnText.innerText = '동기화 (가능)';
-    }
-  }, 1000);
-}
-
-async function reRenderCalendar() {
+/**
+ * 과제 정보를 불러와 캘린더를 그린다.
+ * 조회 부하는 getInfo 내부의 캐시가 담당하므로 여기서 따로 막지 않는다.
+ */
+async function syncCalendar(): Promise<void> {
   Loading.show();
 
-  const { asyncTimeJSON } = await chrome.storage.local.get('asyncTimeJSON');
-  if (
-    !asyncTimeJSON ||
-    (typeof asyncTimeJSON === 'string' && new Date().getTime() - new Date(asyncTimeJSON).getTime() > 1000 * 60)
-  ) {
-    const info = await getInfo();
-    assignmentData = info;
-    await chrome.storage.local.set({
-      asyncTimeJSON: new Date().toJSON(),
-      info: JSON.stringify(info),
-    });
-    setRenderBtn();
-    await loadCalendarDate({
-      year: selectedDate.getFullYear(),
-      month: selectedDate.getMonth() + 1,
-    });
-    Loading.hide();
-    return;
-  }
-
-  const { info } = await chrome.storage.local.get('info');
-
-  if (typeof info !== 'string') return;
-  
-  const parsed: unknown = JSON.parse(info);
-  if (!Array.isArray(parsed)) return;
-  assignmentData = parsed.map((data) => ({ 
-    ...data, 
-    dueDate: data.dueDate !== null ? new Date(data.dueDate) : null, 
-  })) as Assignment[];
-
+  assignmentData = await getInfo();
   await loadCalendarDate({
     year: selectedDate.getFullYear(),
     month: selectedDate.getMonth() + 1,
   });
+
   Loading.hide();
+}
+
+/**
+ * 헤더의 유형 범례를 그린다.
+ * @param { Element } calendar - 캘린더 루트 요소
+ */
+function renderTypeLegend(calendar: Element): void {
+  const legend = calendar.querySelector('.calendar-header-info-icons');
+  if (legend === null) return;
+
+  legend.innerHTML = '';
+  Object.values(ASSIGNMENT_TYPE).forEach((type) => {
+    const box = document.createElement('div');
+    const img = document.createElement('img');
+
+    img.src = chrome.runtime.getURL(`/assets/img-v2/${type}.svg`);
+    img.alt = type;
+    box.title = type;
+    box.appendChild(img);
+    legend.appendChild(box);
+  });
 }
 
 /**
@@ -255,20 +217,10 @@ async function createCalendar(): Promise<HTMLElement> {
       .then(async (data) => {
         const leftImg = chrome.runtime.getURL('/assets/img/left.png');
         const rightImg = chrome.runtime.getURL('/assets/img/right.png');
-        const homeWorkImg = chrome.runtime.getURL('/assets/img/homework.png');
-        const videoImg = chrome.runtime.getURL('/assets/img/video.png');
-        const quizImg = chrome.runtime.getURL('/assets/img/quiz.png');
-        const zoomImg = chrome.runtime.getURL('/assets/img/zoom.png');
-        const loadingImg = chrome.runtime.getURL('/assets/img/loading.png');
 
         return (await data.text())
           .replace('{left}', leftImg)
-          .replace('{right}', rightImg)
-          .replaceAll('{homework}', homeWorkImg)
-          .replaceAll('{video}', videoImg)
-          .replaceAll('{quiz}', quizImg)
-          .replaceAll('{zoom}', zoomImg)
-          .replace('{loading}', loadingImg);
+          .replace('{right}', rightImg);
       })
       .then((text) => {
         const doc = domparser.parseFromString(text, 'text/html');
@@ -281,11 +233,12 @@ async function createCalendar(): Promise<HTMLElement> {
           return;
         }
 
+        renderTypeLegend(calendar);
+
         const leftBtn = calendar.querySelector('#prevMonth');
         const rightBtn = calendar.querySelector('#nextMonth');
-        const reRenderBtn = calendar.querySelector('#re-rendering');
 
-        if (leftBtn === null || rightBtn === null || reRenderBtn === null) {
+        if (leftBtn === null || rightBtn === null) {
           reject(new Error('calendar buttons not found'));
           return;
         }
@@ -306,10 +259,6 @@ async function createCalendar(): Promise<HTMLElement> {
             month: selectedDate.getMonth() + 1,
           });
         });
-        reRenderBtn.addEventListener('click', () => {
-          reRenderCalendar();
-        });
-
         summary.innerText = 'Plato Calendar 2';
         toggle.appendChild(summary);
         toggle.appendChild(calendar);
@@ -330,61 +279,10 @@ async function initCalendar(targetContainer: HTMLElement) {
   targetContainer.insertBefore(calendar, targetContainer.firstChild);
 }
 
-/**
- * 캘린더 데이터 로드
- */
-async function loadCalendarData() {
-  const { asyncTimeJSON } = await chrome.storage.local.get('asyncTimeJSON');
-  if (
-    !asyncTimeJSON ||
-    (typeof asyncTimeJSON === 'string' && new Date().getTime() - new Date(asyncTimeJSON).getTime() > 1000 * 60)
-  ) {
-    const info = await getInfo();
-    assignmentData = info;
-    await chrome.storage.local.set({
-      asyncTimeJSON: new Date().toJSON(),
-      info: JSON.stringify(info),
-    });
-    setRenderBtn(60);
-    return;
-  }
-
-  const { info } = await chrome.storage.local.get('info');
-
-  if (typeof info === 'string') {
-    const parsed: unknown = JSON.parse(info);
-    if (!Array.isArray(parsed)) return;
-
-    assignmentData = parsed.map((data) => ({
-      ...data,
-      dueDate: data.dueDate !== null ? new Date(data.dueDate) : null,
-    })) as Assignment[];
-  }
-
-
-  await chrome.storage.local.set({
-    asyncTimeJSON,
-    info: JSON.stringify(assignmentData),
-  });
-
-  if (typeof asyncTimeJSON === 'string') {
-    const timeInterval = (new Date().getTime() - new Date(asyncTimeJSON).getTime()) / 1000;
-    setRenderBtn(timeInterval > 60 ? 0 : 60 - timeInterval);
-  }
-
-}
-
 window.onload = async () => {
   const targetContainer: HTMLElement | null = document.querySelector('#page-content .ongoing-courses');
   if (targetContainer === null)
     return;
   await initCalendar(targetContainer);
-  Loading.show();
-  await loadCalendarData().then(() => {
-    loadCalendarDate({
-      year: selectedDate.getFullYear(),
-      month: selectedDate.getMonth() + 1,
-    });
-    Loading.hide();
-  });
+  await syncCalendar();
 };
