@@ -1,9 +1,11 @@
 /* setting */
 :root {
-  --pnuColor: #308bc5;
+  --pnuColor: #0275f8;
   --backgroundColor: #fafafa;
   --borderColor: #d3d3d3;
   --textColor: #616161;
+  --fontFamily: 'Pretendard Variable', Pretendard, -apple-system,
+    'Malgun Gothic', Helvetica, sans-serif, AppleGothic;
 }
 
 summary {
@@ -30,7 +32,7 @@ a:visited {
   justify-content: start;
   align-items: stretch;
   flex-direction: column;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: var(--fontFamily);
 }
 
 #prevMonth:hover {
@@ -78,6 +80,12 @@ a:visited {
 
 .calendar-header > div:first-child > img {
   padding: 10px;
+}
+
+#thisMonth {
+  width: 160px;
+  justify-content: center;
+  white-space: nowrap;
 }
 
 .calendar-header-info {
@@ -225,86 +233,164 @@ a:visited {
   z-index: 5;
 }
 
+/* 헤더는 고정하고 목록만 스크롤되도록 세로 flex로 나눈다. */
 .plato-calendar-2-modal-content {
   display: flex;
   flex-direction: column;
-  justify-content: start;
-  align-items: center;
-  overflow-y: scroll;
-  overflow-x: hidden;
+  overflow: hidden;
   width: 50%;
   max-width: 500px;
-  height: 50%;
-  border-radius: 32px;
-  background-color: var(--backgroundColor) !important;
+  max-height: 70%;
+  box-sizing: border-box;
+  padding: 8px;
+  border-radius: 16px;
+  background-color: var(--csms-bg-hierarchy-primary, #fcfcfc) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
 }
 
-.plato-calendar-2-modal-content::-webkit-scrollbar {
-  display: none;
-}
-
-.plato-calendar-2-modal-content > span {
+.plato-calendar-2-modal-header {
   display: flex;
-  justify-content: end;
-  width: 90%;
-  padding: 10px;
-  color: var(--textColor);
-  font-size: 20px;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  /* 목록이 헤더 밑으로 지나가므로 nav의 .bar와 같은 색으로 경계를 준다. */
+  margin-bottom: 4px;
+  padding: 8px 8px 8px 10px;
+  border-bottom: 1px solid var(--csms-bo-hierarchy-secondary, #e0e3e5);
 }
 
-.plato-calendar-2-modal-content-header {
+.plato-calendar-2-modal-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--csms-tx-hierarchy-primary, #161819);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 21px;
+}
+
+.plato-calendar-2-modal-close {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  margin-left: auto;
+  padding: 4px;
+  border: 0;
+  border-radius: 8px;
+  background-color: transparent;
   cursor: pointer;
 }
 
-.plato-calendar-2-modal-content-card {
+.plato-calendar-2-modal-close:hover {
+  background-color: var(--csms-bg-hierarchy-tertiary, #e0e3e5);
+}
+
+.plato-calendar-2-modal-close img {
+  width: 20px;
+  height: 20px;
+}
+
+.plato-calendar-2-modal-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  /* flex 자식의 기본 min-height 때문에 목록이 줄지 않는 것을 막는다. */
+  min-height: 0;
+  overflow-y: auto;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.plato-calendar-2-modal-list::-webkit-scrollbar {
+  display: none;
+}
+
+/* 사이드 nav의 학교 서비스 하위 항목(.csms-service-menu)과 같은 결의 행 카드 */
+.plato-calendar-2-service-menu {
   display: flex;
   align-items: center;
-  width: 80%;
-  margin-bottom: 10px;
-  border-radius: 20px;
-  padding: 20px;
-  background-color: white;
+  gap: 4px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background-color: transparent;
   text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 21px;
+  letter-spacing: -0.07px;
 }
 
-.plato-calendar-2-modal-content-card:hover {
-  background: var(--borderColor);
-  transition: ease-in-out 0.5s;
+.plato-calendar-2-service-menu:hover {
+  background-color: var(--csms-bg-hierarchy-tertiary, #e0e3e5);
 }
 
-.plato-calendar-2-modal-content-card > img {
-  width: 36px;
-  height: 36px;
-  margin-right: 10px;
+.plato-calendar-2-service-menu:focus {
+  background-color: var(--csms-bg-neutral-w1p, rgba(0, 0, 0, 0.01));
+  box-shadow: inset 0 0 0 2px
+    var(--csms-bg-semantic-info-30p, rgba(17, 129, 249, 0.3));
 }
 
-.plato-calendar-2-modal-content-card > div {
-  display: grid;
-  grid-template-rows: 1fr 1fr;
-  grid-template-columns: 1fr 1fr;
-  width: 100%;
+.plato-calendar-2-service-menu-bullet {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
 }
 
-.plato-calendar-2-modal-content-card > div > div {
-  color: var(--textColor) !important;
+.plato-calendar-2-service-menu-bullet img {
+  width: 20px;
+  height: 20px;
 }
 
-.plato-calendar-2-modal-content-card > div > div:first-child {
-  grid-column: 1 / span 2;
-  color: black !important;
-  font-weight: bold !important;
+.plato-calendar-2-service-menu-name {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 }
 
-.plato-calendar-2-modal-content-card > div > div:nth-child(2) {
-  width: 90%;
-  text-wrap: nowrap;
+.plato-calendar-2-service-menu-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--csms-tx-hierarchy-secondary, #2c2f32) !important;
 }
 
-.plato-calendar-2-done-modal-card {
-  background-color: var(--borderColor) !important;
+.plato-calendar-2-service-menu-desc {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--csms-tx-hierarchy-tertiary, #575e64) !important;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 18px;
 }
 
-.plato-calendar-2-done-modal-card > img {
+/* 외부 링크 아이콘은 nav와 동일하게 hover/focus에서만 드러낸다. */
+.plato-calendar-2-service-menu-external {
+  display: none;
+  align-items: center;
+  flex-shrink: 0;
+  margin-left: auto;
+  padding-left: 4px;
+}
+
+.plato-calendar-2-service-menu-external img {
+  width: 20px;
+  height: 20px;
+}
+
+.plato-calendar-2-service-menu:hover .plato-calendar-2-service-menu-external,
+.plato-calendar-2-service-menu:focus .plato-calendar-2-service-menu-external {
+  display: flex;
+}
+
+/* 완료된 활동은 캘린더 칸과 같은 방식으로 죽인다. */
+.plato-calendar-2-done-modal-card .plato-calendar-2-service-menu-bullet img {
   filter: grayscale(1);
   opacity: 0.45;
+}
+
+.plato-calendar-2-done-modal-card .plato-calendar-2-service-menu-title {
+  color: var(--csms-tx-hierarchy-tertiary, #575e64) !important;
+  text-decoration: line-through;
 }

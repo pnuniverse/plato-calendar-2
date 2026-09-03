@@ -19,7 +19,7 @@
         "https://plato.pusan.ac.kr/*"
       ],
       "css": [
-        "assets/prev-style.css",
+        "assets/style.css",
         "assets/loader.css"
       ],
       "js": [
@@ -39,8 +39,8 @@
         "assets/img/right.png",
         "assets/img-v2/*.svg",
         "assets/calendar.html",
-        "assets/new-style.css",
-        "assets/prev-style.css"
+        "assets/modal.html",
+        "assets/style.css"
       ],
       "matches": [
         "https://plato.pusan.ac.kr/*"

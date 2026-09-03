@@ -1,0 +1,34 @@
+<div id="plato-calendar-2-modal">
+  <div class="plato-calendar-2-modal-content">
+    <header class="plato-calendar-2-modal-header">
+      <div class="plato-calendar-2-modal-title"></div>
+      <button
+        type="button"
+        class="plato-calendar-2-modal-close"
+        title="닫기"
+        aria-label="닫기"
+      >
+        <img src="{close}" alt="닫기" />
+      </button>
+    </header>
+
+    <ul class="plato-calendar-2-modal-list"></ul>
+  </div>
+</div>
+<!-- 과제 한 줄. openModal이 복제해서 데이터를 채운다. -->
+<template id="plato-calendar-2-modal-card">
+  <li>
+    <a class="plato-calendar-2-service-menu" target="_blank">
+      <div class="plato-calendar-2-service-menu-bullet">
+        <img alt="" />
+      </div>
+      <div class="plato-calendar-2-service-menu-name">
+        <div class="plato-calendar-2-service-menu-title"></div>
+        <div class="plato-calendar-2-service-menu-desc"></div>
+      </div>
+      <div class="plato-calendar-2-service-menu-external">
+        <img src="{externalLink}" alt="" />
+      </div>
+    </a>
+  </li>
+</template>

@@ -1,84 +1,104 @@
-<div class="calendar">
-  <header class="calendar-header">
-    <div>
-      <img id="prevMonth" src="{left}" alt="저번달" />
-      <div id="thisMonth"></div>
-      <img id="nextMonth" src="{right}" alt="다음달" />
-    </div>
-    <div class="calendar-header-info">
-      <!-- 유형 아이콘은 content-script의 renderTypeLegend가 채운다 -->
-      <div class="calendar-header-info-icons"></div>
-    </div>
-  </header>
+<details id="plato_calendar-container">
+  <summary>Plato Calendar 2</summary>
 
-  <div class="calendar-content">
-    <ul class="calendar-content-weekdays">
-      <li>Sun</li>
-      <li>Mon</li>
-      <li>Tue</li>
-      <li>Wed</li>
-      <li>Thu</li>
-      <li>Fri</li>
-      <li>Sat</li>
-    </ul>
-    <ul class="calendar-content-week" id="firstWeek">
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-    </ul>
-    <ul class="calendar-content-week" id="secondWeek">
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-    </ul>
-    <ul class="calendar-content-week" id="thirdWeek">
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-    </ul>
-    <ul class="calendar-content-week" id="fourthWeek">
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-    </ul>
-    <ul class="calendar-content-week" id="fifthWeek">
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-    </ul>
-    <ul class="calendar-content-week" id="sixthWeek">
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-      <li></li>
-    </ul>
-  </div>
+  <div class="calendar">
+    <header class="calendar-header">
+      <div>
+        <img id="prevMonth" src="{left}" alt="저번달" />
+        <div id="thisMonth"></div>
+        <img id="nextMonth" src="{right}" alt="다음달" />
+      </div>
+      <div class="calendar-header-info">
+        <!-- 유형 아이콘은 content-script의 renderTypeLegend가 채운다 -->
+        <div class="calendar-header-info-icons"></div>
+      </div>
+    </header>
 
-  <div id="plato-calendar-2-modal">
-    <div class="plato-calendar-2-modal-content">
+    <div class="calendar-content">
+      <ul class="calendar-content-weekdays">
+        <li>Sun</li>
+        <li>Mon</li>
+        <li>Tue</li>
+        <li>Wed</li>
+        <li>Thu</li>
+        <li>Fri</li>
+        <li>Sat</li>
+      </ul>
+      <ul class="calendar-content-week" id="firstWeek">
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+      </ul>
+      <ul class="calendar-content-week" id="secondWeek">
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+      </ul>
+      <ul class="calendar-content-week" id="thirdWeek">
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+      </ul>
+      <ul class="calendar-content-week" id="fourthWeek">
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+      </ul>
+      <ul class="calendar-content-week" id="fifthWeek">
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+      </ul>
+      <ul class="calendar-content-week" id="sixthWeek">
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+      </ul>
     </div>
   </div>
-</div>
+</details>
+
+<!-- 캘린더 한 칸. renderCell이 복제해서 날짜와 아이콘을 채운다. -->
+<template id="plato-calendar-2-cell">
+  <span></span>
+  <div></div>
+</template>
+
+<!-- 칸 안의 유형별 아이콘. renderCell이 그 날 있는 유형 수만큼 복제한다. -->
+<template id="plato-calendar-2-cell-icon">
+  <div class="calendar-content-week-icon">
+    <img alt="" />
+    <span></span>
+  </div>
+</template>
+
+<!-- 헤더의 유형 범례 항목. renderTypeLegend가 복제한다. -->
+<template id="plato-calendar-2-legend-item">
+  <div>
+    <img alt="" />
+  </div>
+</template>

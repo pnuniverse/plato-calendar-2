@@ -4,40 +4,115 @@ import Loading from './loading';
 const selectedDate = new Date();
 let assignmentData: Assignment[] = [];
 
-/**
- * data row 모달창에 생성하는 함수
- */
-function createModalContent(assignment: Assignment) {
+/** assets의 html 파일에서 꺼내 둔 조각 template. id를 키로 쓴다. */
+const templates = new Map<string, HTMLTemplateElement>();
 
+/**
+ * assets 하위 html 조각을 불러와 {키} 자리를 채운 뒤 파싱한다.
+ * 파일에 들어 있는 template은 자동으로 등록해 cloneTemplate으로 꺼내 쓴다.
+ * @param { string } path - 확장 프로그램 기준 경로
+ * @param { Record<string, string> } replacements - 치환할 {키}와 값
+ */
+async function loadTemplate(
+  path: string,
+  replacements: Record<string, string> = {},
+): Promise<Document> {
+  const response = await fetch(chrome.runtime.getURL(path));
+  const html = Object.entries(replacements).reduce(
+    (text, [key, value]) => text.replaceAll(`{${key}}`, value),
+    await response.text(),
+  );
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+
+  doc.querySelectorAll('template').forEach((template) => {
+    templates.set(template.id, template);
+  });
+
+  return doc;
+}
+
+/**
+ * 등록해 둔 조각 template을 복제한다.
+ * @param { string } id - template 요소의 id
+ */
+function cloneTemplate(id: string): DocumentFragment {
+  const template = templates.get(id);
+
+  if (template === undefined) {
+    throw new Error(`cloneTemplate: unknown template ${id}`);
+  }
+
+  return document.importNode(template.content, true);
+}
+
+/**
+ * 마감일 표기 문자열
+ */
+function formatDueDate(dueDate: Date): string {
+  const pad = (value: number) => value.toString().padStart(2, '0');
+
+  return `${dueDate.getFullYear()}-${pad(dueDate.getMonth() + 1)}-${pad(dueDate.getDate())} ${pad(dueDate.getHours())}:${pad(dueDate.getMinutes())}`;
+}
+
+/**
+ * 과제 하나를 모달 카드 한 줄로 만든다. 구조는 assets/modal.html의 template에 있고
+ * 여기서는 복제본에 데이터만 채운다.
+ * @param { Assignment } assignment - 과제 정보
+ */
+function createModalContent(assignment: Assignment): DocumentFragment {
   if (assignment.dueDate === null) {
     throw new Error('createModalContent: dueDate is required');
   }
 
-  const link = document.createElement('a');
-  const img = document.createElement('img');
-  const contentDiv = document.createElement('div');
-
-  const typeImg = chrome.runtime.getURL(
-    `/assets/img-v2/${assignment.type}.svg`,
+  const card = cloneTemplate('plato-calendar-2-modal-card');
+  const link = card.querySelector<HTMLAnchorElement>(
+    '.plato-calendar-2-service-menu',
+  );
+  const icon = card.querySelector<HTMLImageElement>(
+    '.plato-calendar-2-service-menu-bullet > img',
+  );
+  const title = card.querySelector<HTMLElement>(
+    '.plato-calendar-2-service-menu-title',
+  );
+  const desc = card.querySelector<HTMLElement>(
+    '.plato-calendar-2-service-menu-desc',
   );
 
-  link.className = 'plato-calendar-2-modal-content-card';
+  if (link === null || icon === null || title === null || desc === null) {
+    throw new Error('createModalContent: broken modal card template');
+  }
+
   if (assignment.isDone) link.classList.add('plato-calendar-2-done-modal-card');
 
   link.href = assignment.link ?? '#';
-  link.target = '_blank';
-  img.src = typeImg;
-  img.alt = `${assignment.type} icon`;
-  
-  const { dueDate } = assignment;
-  contentDiv.innerHTML = `
-    <div style="overflow:hidden">${assignment.title}</div>
-    <div style="overflow:hidden">${assignment.courseName}</div>
-    <div> 마감일 ${dueDate.getFullYear()}-${dueDate.getMonth() + 1}-${dueDate.getDate()}  ${dueDate.getHours().toString().padStart(2, '0')}:${dueDate.getMinutes().toString().padStart(2, '0')}</div>
-    `;
-  link.appendChild(img);
-  link.appendChild(contentDiv);
-  return link;
+  link.title = assignment.title;
+
+  icon.src = chrome.runtime.getURL(`/assets/img-v2/${assignment.type}.svg`);
+  icon.alt = assignment.type;
+
+  title.textContent = assignment.title;
+  desc.textContent = [
+    assignment.courseName,
+    `마감 ${formatDueDate(assignment.dueDate)}`,
+  ]
+    .filter(Boolean)
+    .join(' · ');
+
+  return card;
+}
+
+/**
+ * 모달 헤더 문구. 한 칸의 한 유형만 넘어오므로 첫 항목을 기준으로 만든다.
+ * @param { Assignment[] } data - 과제 정보
+ */
+function createModalTitle(data: Assignment[]): string {
+  const [first] = data;
+  if (first === undefined) return '';
+
+  const { dueDate } = first;
+  if (dueDate === null) return first.type;
+
+  return `${dueDate.getMonth() + 1}월 ${dueDate.getDate()}일 ${first.type}`;
 }
 
 /**
@@ -46,30 +121,28 @@ function createModalContent(assignment: Assignment) {
  */
 function openModal(data: Assignment[]): void {
   const modal = document.querySelector<HTMLElement>('#plato-calendar-2-modal');
-  const modalContent = document.querySelector<HTMLElement>('.plato-calendar-2-modal-content');
+  const title = document.querySelector<HTMLElement>(
+    '.plato-calendar-2-modal-title',
+  );
+  const list = document.querySelector<HTMLElement>(
+    '.plato-calendar-2-modal-list',
+  );
 
-  if (modal === null || modalContent === null) return;
+  if (modal === null || title === null || list === null) return;
 
-  const closeBtn = document.createElement('span');
   const DoneData = data.filter((item) => item.isDone);
   const NotDoneData = data.filter((item) => !item.isDone);
 
-  modalContent.innerHTML = '';
-  closeBtn.className = 'plato-calendar-2-modal-content-header';
-  closeBtn.innerText = 'x';
-  closeBtn.addEventListener('click', () => {
-    modal.style.display = 'none';
-  });
-  modalContent.appendChild(closeBtn); // 닫기 버튼 추가
+  title.textContent = createModalTitle(data);
 
+  list.innerHTML = '';
   NotDoneData.forEach((assignment) => {
-    const linkObj = createModalContent(assignment);
-    modalContent.appendChild(linkObj);
+    list.appendChild(createModalContent(assignment));
   });
   DoneData.forEach((assignment) => {
-    const linkObj = createModalContent(assignment);
-    modalContent.appendChild(linkObj);
+    list.appendChild(createModalContent(assignment));
   });
+
   modal.style.display = 'flex';
 }
 
@@ -86,8 +159,11 @@ function hasDueDate(
  * @param date - 해당 칸에 표시할 날짜(1~31)
  */
 function renderCell(cell: HTMLElement, date: number): void {
-  const spanCell = document.createElement('span');
-  const divCell = document.createElement('div');
+  const content = cloneTemplate('plato-calendar-2-cell');
+  const dateLabel = content.querySelector('span');
+  const icons = content.querySelector('div');
+
+  if (dateLabel === null || icons === null) return;
 
   const dateData = assignmentData
   .filter(hasDueDate)
@@ -106,28 +182,28 @@ function renderCell(cell: HTMLElement, date: number): void {
     if (items.length === 0) return;
 
     const doneCount = items.filter((item) => item.isDone).length;
-    const iconDiv = document.createElement('div');
-    const iconImg = document.createElement('img');
-    const countSpan = document.createElement('span');
+    const iconFragment = cloneTemplate('plato-calendar-2-cell-icon');
+    const icon = iconFragment.querySelector<HTMLElement>(
+      '.calendar-content-week-icon',
+    );
+    const iconImg = iconFragment.querySelector('img');
+    const countSpan = iconFragment.querySelector('span');
 
-    iconDiv.className = 'calendar-content-week-icon';
-    if (doneCount === items.length) iconDiv.classList.add('done-assignment');
-    iconDiv.title = type;
+    if (icon === null || iconImg === null || countSpan === null) return;
+
+    if (doneCount === items.length) icon.classList.add('done-assignment');
+    icon.title = type;
 
     iconImg.src = chrome.runtime.getURL(`/assets/img-v2/${type}.svg`);
     iconImg.alt = type;
-    countSpan.innerText = `${doneCount}/${items.length}`;
+    countSpan.textContent = `${doneCount}/${items.length}`;
 
-    iconDiv.appendChild(iconImg);
-    iconDiv.appendChild(countSpan);
-    iconDiv.addEventListener('click', () => openModal(items));
-    divCell.appendChild(iconDiv);
+    icon.addEventListener('click', () => openModal(items));
+    icons.appendChild(icon);
   });
 
-  spanCell.innerText = String(date);
-
-  cell.appendChild(spanCell);
-  cell.appendChild(divCell);
+  dateLabel.textContent = String(date);
+  cell.appendChild(content);
 }
 
 /**
@@ -194,88 +270,100 @@ function renderTypeLegend(calendar: Element): void {
 
   legend.innerHTML = '';
   Object.values(ASSIGNMENT_TYPE).forEach((type) => {
-    const box = document.createElement('div');
-    const img = document.createElement('img');
+    const item = cloneTemplate('plato-calendar-2-legend-item');
+    const box = item.querySelector('div');
+    const img = item.querySelector('img');
+
+    if (box === null || img === null) return;
 
     img.src = chrome.runtime.getURL(`/assets/img-v2/${type}.svg`);
     img.alt = type;
     box.title = type;
-    box.appendChild(img);
-    legend.appendChild(box);
+    legend.appendChild(item);
   });
 }
 
 /**
- * 캘린더 생성
+ * 캘린더 생성. 구조는 assets/calendar.html에 있고 여기서는 이미지 경로만 채운다.
  */
 async function createCalendar(): Promise<HTMLElement> {
-  const domparser = new DOMParser();
-  const calendarURL = chrome.runtime.getURL('/assets/calendar.html');
-
-  return new Promise<HTMLElement>((resolve, reject) => {
-    fetch(calendarURL)
-      .then(async (data) => {
-        const leftImg = chrome.runtime.getURL('/assets/img/left.png');
-        const rightImg = chrome.runtime.getURL('/assets/img/right.png');
-
-        return (await data.text())
-          .replace('{left}', leftImg)
-          .replace('{right}', rightImg);
-      })
-      .then((text) => {
-        const doc = domparser.parseFromString(text, 'text/html');
-        const toggle = document.createElement('details');
-        const summary = document.createElement('summary');
-        const calendar = doc.querySelector('.calendar');
-
-        if (calendar === null) {
-          reject(new Error('calendar element not found'));
-          return;
-        }
-
-        renderTypeLegend(calendar);
-
-        const leftBtn = calendar.querySelector('#prevMonth');
-        const rightBtn = calendar.querySelector('#nextMonth');
-
-        if (leftBtn === null || rightBtn === null) {
-          reject(new Error('calendar buttons not found'));
-          return;
-        }
-
-        leftBtn.addEventListener('click', () => {
-          selectedDate.setDate(1);
-          selectedDate.setMonth(selectedDate.getMonth() - 1);
-          loadCalendarDate({
-            year: selectedDate.getFullYear(),
-            month: selectedDate.getMonth() + 1,
-          });
-        });
-        rightBtn.addEventListener('click', () => {
-          selectedDate.setDate(1);
-          selectedDate.setMonth(selectedDate.getMonth() + 1);
-          loadCalendarDate({
-            year: selectedDate.getFullYear(),
-            month: selectedDate.getMonth() + 1,
-          });
-        });
-        summary.innerText = 'Plato Calendar 2';
-        toggle.appendChild(summary);
-        toggle.appendChild(calendar);
-        toggle.id = 'plato_calendar-container';
-
-        resolve(toggle);
-      })
-      .catch((error) => {
-        console.log('error: ', error);
-        reject();
-      });
+  const doc = await loadTemplate('/assets/calendar.html', {
+    left: chrome.runtime.getURL('/assets/img/left.png'),
+    right: chrome.runtime.getURL('/assets/img/right.png'),
   });
+
+  const container = doc.querySelector<HTMLElement>('#plato_calendar-container');
+  const calendar = container?.querySelector('.calendar') ?? null;
+
+  if (container === null || calendar === null) {
+    throw new Error('calendar element not found');
+  }
+
+  renderTypeLegend(calendar);
+
+  const leftBtn = calendar.querySelector('#prevMonth');
+  const rightBtn = calendar.querySelector('#nextMonth');
+
+  if (leftBtn === null || rightBtn === null) {
+    throw new Error('calendar buttons not found');
+  }
+
+  leftBtn.addEventListener('click', () => {
+    selectedDate.setDate(1);
+    selectedDate.setMonth(selectedDate.getMonth() - 1);
+    loadCalendarDate({
+      year: selectedDate.getFullYear(),
+      month: selectedDate.getMonth() + 1,
+    });
+  });
+  rightBtn.addEventListener('click', () => {
+    selectedDate.setDate(1);
+    selectedDate.setMonth(selectedDate.getMonth() + 1);
+    loadCalendarDate({
+      year: selectedDate.getFullYear(),
+      month: selectedDate.getMonth() + 1,
+    });
+  });
+
+  return container;
+}
+
+/**
+ * 모달 생성. 구조는 assets/modal.html에 있고 여기서는 아이콘 경로만 채운다.
+ */
+async function createModal(): Promise<HTMLElement> {
+  const doc = await loadTemplate('/assets/modal.html', {
+    close: chrome.runtime.getURL('/assets/img-v2/close.svg'),
+    externalLink: chrome.runtime.getURL('/assets/img-v2/external-link.svg'),
+  });
+
+  const modal = doc.querySelector<HTMLElement>('#plato-calendar-2-modal');
+
+  if (modal === null) {
+    throw new Error('modal element not found');
+  }
+
+  const closeBtn = modal.querySelector('.plato-calendar-2-modal-close');
+
+  if (closeBtn === null) {
+    throw new Error('modal close button not found');
+  }
+
+  closeBtn.addEventListener('click', () => {
+    modal.style.display = 'none';
+  });
+
+  return modal;
 }
 
 async function initCalendar(targetContainer: HTMLElement) {
   const calendar: HTMLElement = await createCalendar();
-  if (!targetContainer) return;
+  const calendarBody = calendar.querySelector('.calendar');
+
+  if (calendarBody === null) return;
+
+  // 모달은 .calendar를 기준으로 절대배치되므로 그 안에 넣는다.
+  calendarBody.appendChild(await createModal());
   targetContainer.insertBefore(calendar, targetContainer.firstChild);
 }
 
